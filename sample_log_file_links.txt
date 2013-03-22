@@ -1,0 +1,4 @@
+http://s3.amazonaws.com/elasticmapreduce/samples/pig-apache/input/access_log_1
+http://s3.amazonaws.com/elasticmapreduce/samples/pig-apache/input/access_log_2
+http://s3.amazonaws.com/elasticmapreduce/samples/pig-apache/input/access_log_3
+http://s3.amazonaws.com/elasticmapreduce/samples/pig-apache/input/access_log_4
