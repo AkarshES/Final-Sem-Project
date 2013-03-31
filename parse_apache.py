@@ -36,7 +36,7 @@ class LogAnalysis:
 		return DataFrame(list(log_data),columns = fields)
 	
 		
-	def mean(self, collection_name, mean_of, groupby = None):
+	def median(self, collection_name, mean_of, groupby = None):
 		log_data = self.load_apache_logs_into_DataFrame(collection_name)
 		computed_mean = None
 		try:
@@ -50,5 +50,5 @@ class LogAnalysis:
 
 if __name__ == '__main__':
 	la = LogAnalysis()
-	print la.mean('access_log','request_size')
-	print la.mean('access_log','request_size','status')
+	print la.median('access_log','request_size')
+	print la.median('access_log','request_size','status')
