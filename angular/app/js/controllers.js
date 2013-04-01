@@ -1,12 +1,10 @@
 'use strict';
 
 /* Controllers */
+function TableCtrl($scope){}
 
-
-function MyCtrl1() {}
-MyCtrl1.$inject = [];
-
-
-function MyCtrl2() {
+function LogViewerCtrl($scope, $http){
+    $http.get('LogData/sample.json').success( function(response_json, status){
+        $scope.LogData = response_json.data
+    })
 }
-MyCtrl2.$inject = [];
