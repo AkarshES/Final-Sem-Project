@@ -28,3 +28,12 @@
   content: "";
   padding: 0;
 }
+
+.logtable {
+    font-size:90%;
+    table-layout:fixed;
+}
+
+.logtable > tr,td {
+    overflow:hidden;
+}

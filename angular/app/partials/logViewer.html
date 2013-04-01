@@ -1,0 +1,23 @@
+<div class="container">
+    <div class="">
+        <div class="well well-small">
+            <form class="form-inline">
+                <h4>Filter by:</h4>
+                <label for="client_ip_query">IP:</label>
+                <input type="text" class="input-medium" id="client_ip_query" ng-model="log_row.client_ip" />
+                <label for="status_query">Status:</label>
+                <input type="text" class="input-mini" id="status_query" ng-model="log_row.status" />
+                <label for="request_query">Request:</label>
+                <input type="text" id="request_query" ng-model="log_row.request" />
+            </form>
+        </div>
+        <table class="table table-condensed table-striped logtable" cellspacing="0">
+            <tr ng-repeat = "row in LogData | filter:log_row">
+                <td style="width:11%;" class="date_column">{{row["date"]}}</td>
+                <td style="width:8%;" class="ip_column">{{row["client_ip"]}}</td>
+                <td style="width:3%;" class="status_column">{{row["status"]}}</td>
+                <td style="width:40%;" class="request_column">{{row["request"]}}</td>
+            </tr>
+        </table>
+    </div>
+</div>

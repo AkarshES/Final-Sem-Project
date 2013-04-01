@@ -2,6 +2,18 @@
 
 
 // Declare app level module which depends on filters, and services
-angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives']).
-  config(['$routeProvider', function($routeProvider) {
-  }]);
+var App = angular.module('App', ['ngResource']);
+App.config(['$routeProvider', function($routeProvider) {
+    $routeProvider
+        .when('/',{
+            templateUrl:"partials/tableView.html",
+            controller:"TableCtrl"
+        })
+        .when('/logviewer',{
+            templateUrl:"partials/logViewer.html",
+            controller:"LogViewerCtrl"
+        })
+        .otherwise({
+            redirectTo:'/'
+        })
+}]);
