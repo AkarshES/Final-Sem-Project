@@ -1,0 +1,7 @@
+{
+    "name": "Random_username",
+    "tables": [
+        "test1",
+        "test2"
+    ]
+}
