@@ -1,5 +1,15 @@
 /* app css stylesheet */
 
+/* to adjust for the navbar */
+body {
+    padding:40px;
+}
+
+/* overiding bootstrap defaults */
+#main-table.table th, #main-table.table td {
+    text-align: center;
+}
+
 .menu {
   list-style: none;
   border-bottom: 0.1em solid black;
