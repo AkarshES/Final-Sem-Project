@@ -6,8 +6,19 @@
   <link rel="stylesheet" href="css/bootstrap.css"/>
   <link rel="stylesheet" href="css/app.css"/>
 </head>
-<body>
-    <ng-view></ng-view>
+<body ng-controller="MainCtrl">
+    <div class="navbar navbar-fixed-top navbar-inverse">
+        <div class="navbar-inner">
+            <a href="#" class="brand">Project name</a>
+            <ul class="nav pull-right">
+                <li><a href="#">{{User.name}}</a></li>
+                <li><a href="#">Sign out</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <ng-view></ng-view>
+    </div>
   <!-- In production use:
   <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular.min.js"></script>
   -->
