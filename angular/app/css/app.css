@@ -10,6 +10,9 @@ body {
     text-align: center;
 }
 
+#login-box.row {
+}
+
 .menu {
   list-style: none;
   border-bottom: 0.1em solid black;
