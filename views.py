@@ -2,7 +2,8 @@ from flask import Response, request, render_template, redirect, url_for, flash, 
 from flask.ext.mongoengine import DoesNotExist, ValidationError
 from flask.ext.login import login_required, logout_user, login_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from server import app, User, db
+from server import app, db
+from User import User
 
 def signin():
     """all logic to check whether a user exists and log him in"""

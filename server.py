@@ -27,7 +27,7 @@ login_manager.setup_app(app)
 #set url to redirect to for login
 login_manager.login_view = '/signin'
 
-import User
+from User import User
 
 #setting up user_loader callback, for Flask login
 @login_manager.user_loader
