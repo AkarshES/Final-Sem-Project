@@ -1,3 +1,5 @@
+# used by virtualenv
+venv
 # used by the Guard plugin
 Guardfile
 
