@@ -6,10 +6,9 @@ var App = angular.module('App', ['ngResource']);
 App.config(['$routeProvider', function($routeProvider) {
     $routeProvider
         .when('/',{
-            templateUrl:"partials/tableView.html",
-            controller:"TableCtrl"
+            templateUrl:"partials/main.html"
         })
-        .when('/logviewer',{
+        .when('/logviewer/:table_name',{
             templateUrl:"partials/logViewer.html",
             controller:"LogViewerCtrl"
         })
