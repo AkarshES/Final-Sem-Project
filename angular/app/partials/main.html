@@ -1,0 +1,17 @@
+<br />
+<br />
+<div class="offset3 span9">
+    <table id="main-table" class="table table-striped">
+        <tr>
+            <th>Table</th>
+            <th>Operations</th>
+        </tr>
+        <tr ng-repeat="table_name in User.tables">
+            <td>{{table_name}}</td>
+            <td>
+                <a href="#/logviewer/{{table_name}}">View logs</a>
+            </td>
+        </tr>
+    </table>
+</div>
+
