@@ -1,7 +1,12 @@
-from flask import Flask,g
-from flask.ext.login import LoginManager
+from flask import Flask, g, request, redirect, url_for,send_from_directory,  render_template
+from flask.ext.login import LoginManager , request, redirect, url_for
 from flask.ext.mongoengine import MongoEngine
+from werkzeug import secure_filename, SharedDataMiddleware
 import os
+
+
+UPLOAD_FOLDER = '/var/tmp'
+#ALLOWED_EXTENSIONS = set(['txt','csv'])
 
 app = Flask(
         __name__,\
@@ -19,6 +24,8 @@ app.config['MONGODB_USERNAME'] = os.environ.get('MONGO_DB_USERNAME')
 app.config['MONGODB_PASSWORD'] = os.environ.get('MONGO_DB_PASSWORD')
 app.config['MONGODB_DB'] = 'test'
 db = MongoEngine(app)
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #set up login manager
 login_manager = LoginManager()
@@ -38,3 +45,13 @@ def load_user(userid):
 app.debug = True
 
 import views
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file :
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return '''Upload successful'''
+    return render_template('upload.html')
