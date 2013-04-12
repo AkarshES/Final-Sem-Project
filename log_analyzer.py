@@ -1,10 +1,13 @@
 #!/usr/bin/python
 import re
 import os
+import io
+import json
 import dateutil.parser
 from datetime import datetime
 from pymongo import MongoClient
 from pandas import DataFrame
+import pandasjson
 
 class LogParser:
     def __init__(self):
@@ -34,7 +37,8 @@ class LogParser:
                 self.log_insert(collection_name,log_data)
             except :
                 print line
-class LogAnalyzer:
+
+class LogAnalyzer:    
     def __init__(self):
         self.client = MongoClient()
         self.db = self.client.project_test
@@ -62,13 +66,17 @@ class LogAnalyzer:
     def count(self, df, field):
         return df[field].count()
 
+    def count_hits(self, collection_name):
+        df = self.load_apache_logs_into_DataFrame(collection_name)
+        df = self.group_by_date(df)
+        json_data = pandasjson.to_json(self.count(df, 'request_size'))
+        json_load = json.loads(json_data)
+        new_json_dict = []
+        for row in json_load:
+            row_list = json.loads(row)
+            new_json_dict.append({'date': datetime(row_list[0][0],row_list[0][1],row_list[0][2]).strftime("%s"), 'status':row_list[1], 'count' : json_load[row]})
+        return pandasjson.to_json(la.count(df, 'request_size'))
+
 if __name__ == '__main__':
-    # la = LogAnalyzer()
-    # df = la.load_apache_logs_into_DataFrame('access_log_1')
-    # df = la.group_by_date(df)
-    # print la.count(df, 'request_size')
-    # print la.median(df, 'request_size')
-    lp = LogParser()
-    lp.load_apache_log_file_into_DB('access_log_2','access_log_2')
-    #print la.median('access_log_1','request_size')
-    #print la.median('access_log_1','request_size','status')
+    la = LogAnalyzer()
+    print la.count_hits('access_log_1')
