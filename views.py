@@ -20,7 +20,6 @@ def signin():
             error = 'User with this email id does not exist'
     return render_template('signin.html', error=error)
 
-@login_required
 def signout():
     '''all logic to correctly logout a user'''
     logout_user()
@@ -53,7 +52,6 @@ def signup():
                 error = 'An internal server error stopped you from signing up'
     return render_template('signup.html', error=error)
 
-@login_required
 def changePassword():
     '''Logic to change the password of the logged in user'''
     error = None
