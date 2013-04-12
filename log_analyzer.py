@@ -46,7 +46,7 @@ class LogAnalyzer:
     def load_apache_logs_into_DataFrame(self, collection_name):
         fields = ['client_ip','date','request','status','request_size','browser_string']
         collection = self.db[collection_name]
-        log_data = collection.find()
+        log_data = collection.find().limit(50)
         return DataFrame(list(log_data),columns = fields)
 
     def median(self, df, mean_of, group_by = None):
@@ -75,8 +75,27 @@ class LogAnalyzer:
         for row in json_load:
             row_list = json.loads(row)
             new_json_dict.append({'date': datetime(row_list[0][0],row_list[0][1],row_list[0][2]).strftime("%s"), 'status':row_list[1], 'count' : json_load[row]})
-        return pandasjson.to_json(la.count(df, 'request_size'))
+        return json.dumps(new_json_dict)
+        #return pandasjson.to_json(la.count(df, 'request_size'))
 
 if __name__ == '__main__':
     la = LogAnalyzer()
     print la.count_hits('access_log_1')
+    
+    #df = la.load_apache_logs_into_DataFrame('access_log_1')
+    #df = la.group_by_date(df)
+    #print la.median(df, 'request_size').index
+    #print la.median(df, 'request_size', 'status').index
+    #print la.median('access_log_1','request_size','status')
+    # df = la.load_apache_logs_into_DataFrame('access_log_1')
+    # df = la.group_by_date(df)
+    # json_data = pandasjson.to_json(la.count(df, 'request_size'))
+    # json_load = json.loads(json_data)
+    # new_json_dict = []
+    # for row in json_load:
+    #     row_list = json.loads(row)
+    #     new_json_dict.append({'date': datetime(row_list[0][0],row_list[0][1],row_list[0][2]).strftime("%s"), 'status':row_list[1], 'count' : json_load[row]})
+    # with io.open('counts.json', 'w', encoding='utf-8') as f:
+    #     f.write(unicode(pandasjson.to_json(la.count(df, 'request_size'))))
+    # print la.median(df, 'request_size')
+    
