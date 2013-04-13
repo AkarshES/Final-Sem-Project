@@ -76,14 +76,18 @@ class LogAnalyzer:
         if df is False:
             return False
         df = self.group_by_date(df)
-        json_data = self.count(df, 'request_size').to_json()
-        #json_data = pandasjson.to_json(self.count(df, 'request_size'))
-        json_load = json.loads(json_data)
-        new_json_dict = []
-        for row in json_load:
-            row_list = json.loads(row)
-            new_json_dict.append({'date': datetime(row_list[0][0],row_list[0][1],row_list[0][2]).strftime("%s"), 'status':row_list[1], 'count' : json_load[row]})
-        return json.dumps({"data": new_json_dict})
+        count_data = self.count(df, 'request_size')
+        counts_list = []
+        for row in count_data.index:
+            counts_list.append({"date" : datetime(row[0][0],row[0][1],row[0][2]).strftime("%s"), "status" : row[1], "count" : str(count_data[row])})
+        return json.dumps(counts_list)
+        # json_data = pandasjson.to_json(self.count(df, 'request_size'))
+        # json_load = json.loads(json_data)
+        # new_json_dict = []
+        # for row in json_load:
+        #     row_list = json.loads(row)
+        #     new_json_dict.append({'date': datetime(row_list[0][0],row_list[0][1],row_list[0][2]).strftime("%s"), 'status':row_list[1], 'count' : json_load[row]})
+        # return json.dumps({"data": new_json_dict})
 
 if __name__ == '__main__':
     # lp = LogParser()
