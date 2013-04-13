@@ -50,7 +50,7 @@ class LogAnalyzer:
         if collection_name not in self.db.collection_names():
             return False
         collection = self.db[collection_name]
-        log_data = collection.find()
+        log_data = collection.find().limit(50)
         return DataFrame(list(log_data),columns = fields)
 
     def median(self, df, mean_of, group_by = None):
@@ -69,13 +69,15 @@ class LogAnalyzer:
 
     def count(self, df, field):
         return df[field].count()
-
+    def group_by(self, df, field):
+        return df.groupby(df[field])
     def count_hits(self, collection_name):
         df = self.load_apache_logs_into_DataFrame(collection_name)
         if df is False:
             return False
         df = self.group_by_date(df)
-        json_data = pandasjson.to_json(self.count(df, 'request_size'))
+        json_data = self.count(df, 'request_size').to_json()
+        #json_data = pandasjson.to_json(self.count(df, 'request_size'))
         json_load = json.loads(json_data)
         new_json_dict = []
         for row in json_load:
