@@ -7,7 +7,7 @@ import dateutil.parser
 from datetime import datetime
 from pymongo import MongoClient
 from pandas import DataFrame
-import pandasjson
+# import pandasjson
 
 class LogParser:
     def __init__(self):
