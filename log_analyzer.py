@@ -72,7 +72,7 @@ class LogAnalyzer:
 
     def count_hits(self, collection_name):
         df = self.load_apache_logs_into_DataFrame(collection_name)
-        if not df:
+        if df is False:
             return False
         df = self.group_by_date(df)
         json_data = pandasjson.to_json(self.count(df, 'request_size'))
@@ -84,5 +84,7 @@ class LogAnalyzer:
         return json.dumps({"data": new_json_dict})
 
 if __name__ == '__main__':
+    # lp = LogParser()
+    # lp.load_apache_log_file_into_DB('access_log_3','access_log_3')
     la = LogAnalyzer()
-    print la.count_hits('access_log_3')
+    print la.count_hits('access_log_1')
