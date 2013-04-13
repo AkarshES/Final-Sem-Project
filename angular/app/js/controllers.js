@@ -13,3 +13,8 @@ function LogViewerCtrl($scope, $http, $routeParams){
         $scope.LogData = response_json.data;
     });
 }
+
+function TableAddCtrl($scope, $http){
+    $scope.create_table = function(){
+    }
+}
