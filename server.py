@@ -2,10 +2,11 @@ from flask import Flask, g, request, redirect, url_for,send_from_directory,  ren
 from flask.ext.login import LoginManager , request, redirect, url_for
 from flask.ext.mongoengine import MongoEngine
 from werkzeug import secure_filename, SharedDataMiddleware
+from log_analyzer import LogParser, LogAnalyzer
 import os
 
 
-UPLOAD_FOLDER = '/var/tmp'
+UPLOAD_FOLDER = '/var/tmp/'
 #ALLOWED_EXTENSIONS = set(['txt','csv'])
 
 app = Flask(
@@ -53,5 +54,9 @@ def upload_file():
         if file :
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            lp=LogParser()
+            lp.load_apache_log_file_into_DB(UPLOAD_FOLDER + filename,filename)
+            la=LogAnalyzer()
+            la.count_hits(filename)
             return '''Upload successful'''
     return render_template('upload.html')
