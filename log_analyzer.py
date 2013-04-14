@@ -7,7 +7,6 @@ import dateutil.parser
 from datetime import datetime
 from pymongo import MongoClient
 from pandas import DataFrame
-# import pandasjson
 
 class LogParser:
     def __init__(self):
@@ -62,7 +61,7 @@ class LogAnalyzer:
         log_list = []
         for log in log_data:
             log_list.append(log)
-            log['date'] = log['date'].strftime("%I:%M%p on %B %d, %Y")
+            log['date'] = log['date'].strftime("%s")
             log.pop('_id')
         return json.dumps({"data" : log_list})
 
