@@ -14,7 +14,11 @@ App.config(['$routeProvider', function($routeProvider) {
         })
         .when('/AddNewTable', {
             templateUrl:'partials/fileUpload.html',
-            controller:"TableAddCtrl"
+            controller:"AddTableCtrl"
+        })
+        .when('/AddNewTable/:table_name', {
+            templateUrl:'partials/fileUpload.html',
+            controller:"AddTableCtrl"
         })
         .otherwise({
             redirectTo:'/'
