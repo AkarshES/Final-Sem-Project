@@ -2,9 +2,13 @@
 <div class="well span4 offset4">
   <form action="/upload" method=post enctype=multipart/form-data>
     <label for="name">Name of Table</label>
-    <input type="text" name="name" autofocus required />
+    <span ng-switch on="table_name">
+      <input ng-switch-when="null" type="text" name="name" autofocus required />
+      <input ng-switch-default type="text" name="name" autofocus required disabled value="{{table_name}}" />
+    </span>
     <label for="file">File Location</label>
     <input type="file" name="file">
+    <br />
     <br />
     <input class="btn btn&#45;large btn&#45;success" type=submit value=Upload>
   </form>
