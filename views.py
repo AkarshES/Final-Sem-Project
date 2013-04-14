@@ -85,7 +85,7 @@ def log_data_retriever(collection_name):
     data = la.get_log_data(collection_name)
     if data is False:
         return jsonify(dict(status = 'Error', message='The collection does not exist'))
-    return jsonify(data)
+    return data
 
 app.add_url_rule('/signin', view_func=signin, methods=['GET', 'POST'])
 app.add_url_rule('/signout', view_func=signout)

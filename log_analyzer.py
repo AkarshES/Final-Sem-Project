@@ -12,7 +12,7 @@ from pandas import DataFrame
 class LogParser:
     def __init__(self):
         self.client = MongoClient()
-        self.db = self.client.project_test
+        self.db = self.client.test
     
     def log_insert(self, collection_name, data):
       collection = self.db[collection_name]
@@ -43,7 +43,7 @@ class LogParser:
 class LogAnalyzer:    
     def __init__(self):
         self.client = MongoClient()
-        self.db = self.client.project_test
+        self.db = self.client.test
 
     def load_apache_logs_into_DataFrame(self, collection_name):
         fields = ['client_ip','date','request','status','request_size','browser_string']
@@ -62,7 +62,7 @@ class LogAnalyzer:
         log_list = []
         for log in log_data:
             log_list.append(log)
-            log['date'] = log['date'].strftime("%s")
+            log['date'] = log['date'].strftime("%I:%M%p on %B %d, %Y")
             log.pop('_id')
         return json.dumps({"data" : log_list})
 

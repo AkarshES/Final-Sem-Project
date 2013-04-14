@@ -9,7 +9,8 @@ function MainCtrl($scope, $http){
 
 function LogViewerCtrl($scope, $http, $routeParams){
     $scope.table_name = $routeParams.table_name;
-    $http.get('../sample_data/sample-data.json').success( function(response_json, status){
+    $http.get('/data/'+$scope.table_name).success( function(response_json, status){
+        console.log('here')
         $scope.LogData = response_json.data;
     });
 }
