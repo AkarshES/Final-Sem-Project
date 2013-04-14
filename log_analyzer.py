@@ -7,12 +7,11 @@ import dateutil.parser
 from datetime import datetime
 from pymongo import MongoClient
 from pandas import DataFrame
-import pandasjson
 
 class LogParser:
     def __init__(self):
         self.client = MongoClient()
-        self.db = self.client.project_test
+        self.db = self.client.test
     
     def log_insert(self, collection_name, data):
       collection = self.db[collection_name]
@@ -43,7 +42,7 @@ class LogParser:
 class LogAnalyzer:    
     def __init__(self):
         self.client = MongoClient()
-        self.db = self.client.project_test
+        self.db = self.client.test
 
     def load_apache_logs_into_DataFrame(self, collection_name):
         fields = ['client_ip','date','request','status','request_size','browser_string']
