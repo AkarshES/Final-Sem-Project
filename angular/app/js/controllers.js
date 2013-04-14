@@ -15,7 +15,6 @@ function LogViewerCtrl($scope, $http, $routeParams){
     });
 }
 
-function TableAddCtrl($scope, $http){
-    $scope.create_table = function(){
-    }
+function AddTableCtrl($scope, $http, $routeParams){
+    $scope.table_name = $routeParams.table_name || null;
 }
