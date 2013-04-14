@@ -79,7 +79,6 @@ def sample_data_returner(filename):
     """ Helper function to return sample data in debug mode """
     return send_from_directory('./angular/sample_data', filename)
 
-@app.route('/data/<string:collection_name>')
 def log_data_retriever(collection_name):
     la = LogAnalyzer()
     data = la.get_log_data(collection_name)
@@ -87,12 +86,25 @@ def log_data_retriever(collection_name):
         return jsonify(dict(status = 'Error', message='The collection does not exist'))
     return data
 
+def upload_file():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file :
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            lp=LogParser()
+            lp.load_apache_log_file_into_DB(UPLOAD_FOLDER + filename, filename)
+            return 'Upload successful, to view the logs at <a href="http://127.0.0.1:5000/#/logviewer/'+filename+'" />Click here</a>'
+    return render_template('upload.html')
+
 app.add_url_rule('/signin', view_func=signin, methods=['GET', 'POST'])
 app.add_url_rule('/signout', view_func=signout)
 app.add_url_rule('/signup', view_func=signup, methods=['GET', 'POST'])
 app.add_url_rule('/changePassword', view_func=changePassword, methods=['GET', 'POST'])
 
 app.add_url_rule('/', view_func=index)
+app.add_url_rule('/upload', view_func=upload_file, methods=['GET', 'POST'])
+app.add_url_rule('/data/<string:collection_name>', view_func=log_data_retriever)
 
 if app.debug is True:
     app.add_url_rule('/sample_data/<path:filename>', view_func=sample_data_returner)
