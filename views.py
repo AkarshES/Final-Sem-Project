@@ -4,6 +4,7 @@ from flask.ext.login import login_required, logout_user, login_user, current_use
 from werkzeug.security import generate_password_hash, check_password_hash
 from server import app, db
 from User import User
+from log_analyzer import LogAnalyzer
 
 def signin():
     """all logic to check whether a user exists and log him in"""
@@ -77,6 +78,14 @@ def index():
 def sample_data_returner(filename):
     """ Helper function to return sample data in debug mode """
     return send_from_directory('./angular/sample_data', filename)
+
+@app.route('/data/<string:collection_name>')
+def log_data_retriever(collection_name):
+    la = LogAnalyzer()
+    data = la.get_log_data(collection_name)
+    if data is False:
+        return jsonify(dict(status = 'Error', message='The collection does not exist'))
+    return data
 
 app.add_url_rule('/signin', view_func=signin, methods=['GET', 'POST'])
 app.add_url_rule('/signout', view_func=signout)

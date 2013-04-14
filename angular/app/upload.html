@@ -1,7 +1,44 @@
 <!doctype html>
-    <title>Upload your Log File</title>
-    <h1>Upload new File</h1>
-    <form action="" method=post enctype=multipart/form-data>
-      <p><input type=file name=file>
-         <input type=submit value=Upload>
-    </form>
+<html lang="en" ng-app="App">
+  <head>
+    <meta charset="utf-8">
+    <title>My AngularJS App</title>
+    <link rel="stylesheet" href="css/bootstrap.css"/>
+    <link rel="stylesheet" href="css/app.css"/>
+  </head>
+  <body ng-controller="MainCtrl">
+    <div class="navbar navbar-fixed-top navbar-inverse">
+      <div class="navbar-inner">
+        <a href="#" class="brand">Project name</a>
+        <ul class="nav pull-right">
+          <li><a href="#">{{User.name}}</a></li>
+          <li><a href="#">Sign out</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="row">
+      <br />
+      <div class="well span4 offset4">
+        <form action="" method=post enctype=multipart/form-data>
+          <label for="name">Name of Table</label>
+          <input type="text" name="name" autofocus required />
+          <label for="file">File Location</label>
+          <input type="file" name="file">
+          <br />
+          <input class="btn btn&#45;large btn&#45;success" type=submit value=Upload>
+        </form>
+      </div>
+    </div>
+    <!-- In production use:
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular.min.js"></script>
+    -->
+    <script src="lib/angular/angular.js"></script>
+    <script src="lib/angular/angular-resource.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/services.js"></script>
+    <script src="js/controllers.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/directives.js"></script>
+  </body>
+</html>
+
