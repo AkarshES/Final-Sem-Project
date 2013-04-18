@@ -46,15 +46,3 @@ def load_user(userid):
 app.debug = True
 
 import views
-
-@app.route('/upload', methods=['GET', 'POST'])
-def upload_file():
-    if request.method == 'POST':
-        file = request.files['file']
-        if file :
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            lp=LogParser()
-            lp.load_apache_log_file_into_DB(UPLOAD_FOLDER + filename, filename)
-            return 'Upload successful, to view the logs at <a href="http://127.0.0.1:5000/#/logviewer/'+filename+'" />Click here</a>'
-    return render_template('upload.html')
