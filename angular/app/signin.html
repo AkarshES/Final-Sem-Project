@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <title>Sign In</title>
-    <link rel="stylesheet" href="css/bootstrap.css"/>
-    <link rel="stylesheet" href="css/app.css"/>
+    <link rel="stylesheet" href="static/css/bootstrap.css"/>
+    <link rel="stylesheet" href="static/css/app.css"/>
   </head>
   <body>
     <div class="navbar navbar-fixed-top navbar-inverse">
@@ -13,10 +13,23 @@
       </div>
     </div>
     <br />
+    {% for message in get_flashed_messages() %}
+    <div class="span5 offset3 alert alert-info fade in" >
+      <span>{[ message ]}</span>
+      <button type="button" class="close" data-dismiss="alert">×</button>
+    </div>
+    {% endfor %}
+    <br />
+    {% if error %} 
+    <div class="span5 offset3 alert alert-info fade in" >
+      <button type="button" class="close" data-dismiss="alert">×</button>
+      <span>{[ error ]}</span>
+    </div> 
+    {% endif %}
     <br />
     <div id="login-box" class="row">
       <div class="well span4 offset4">
-        <form action="{[ url_for('signin') ]}" method=post>
+        <form action="" method=post>
           <h3>Sign in</h3>
           <label for="email">Email:</label>
           <input type="email" autofocus required name="email">
@@ -27,6 +40,6 @@
         </form>
       </div>
     </div>
-    <script src="lib/angular/angular.js"></script>
+    <script src="static/lib/angular/angular.js"></script>
   </body>
 </html>
