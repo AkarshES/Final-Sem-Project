@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block body %}
+  <div id="login-box">
+    <div class="well span4 offset4">
+      <form action="" method=post>
+        <h3>Sign in</h3>
+        <label for="email">Email:</label>
+        <input type="email" autofocus required name="email">
+        <label for="password">Password:</label>
+        <input type="password" name="password" required>
+        <br />
+        <input class="btn btn-large btn-success" type="submit" value="Sign in">
+      </form>
+    </div>
+  </div>
+{% endblock %}
