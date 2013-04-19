@@ -98,18 +98,6 @@ def upload_file():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             lp=LogParser()
-            lp.load_apache_log_file_into_DB(UPLOAD_FOLDER + filename, filename)
+            lp.load_apache_log_file_into_DB(app.config['UPLOAD_FOLDER'] + filename, filename)
             return 'Upload successful, to view the logs at <a href="http://127.0.0.1:5000/#/logviewer/'+filename+'" />Click here</a>'
     return render_template('upload.html')
-
-app.add_url_rule('/signin', view_func=signin, methods=['GET', 'POST'])
-app.add_url_rule('/signout', view_func=signout)
-app.add_url_rule('/signup', view_func=signup, methods=['GET', 'POST'])
-app.add_url_rule('/changePassword', view_func=changePassword, methods=['GET', 'POST'])
-
-app.add_url_rule('/', view_func=index)
-app.add_url_rule('/upload', view_func=upload_file, methods=['GET', 'POST'])
-app.add_url_rule('/data/<string:collection_name>', view_func=log_data_retriever)
-
-if app.debug is True:
-    app.add_url_rule('/sample_data/<path:filename>', view_func=sample_data_returner)

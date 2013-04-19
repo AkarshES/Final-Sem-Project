@@ -45,7 +45,4 @@ def load_user(userid):
     except db.DoesNotExist:
         return None
 
-#setting debug here to make sure that some routes are loaded only in debug mode
-app.debug = True
-
 import views
