@@ -11,8 +11,8 @@ UPLOAD_FOLDER = '/var/tmp/'
 app = Flask(
         __name__\
         , static_url_path='/static'\
-        , static_folder = './angular/app/'\
-        , template_folder='./angular/app/'\
+        , static_folder = '../angular/app/'\
+        , template_folder='../angular/app/jinja-templates'\
     )
 
 # overriding default jinja template tags, to avoid conflicts with angularjs
