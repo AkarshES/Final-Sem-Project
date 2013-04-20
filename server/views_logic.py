@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug import secure_filename, SharedDataMiddleware
 from server import app, db
 from User import User
+from Logsets_metadata import ApacheAccessLogsetMetadata, LogsetMetadata
 from log_analyzer import LogAnalyzer, LogParser
 import os
 
@@ -57,6 +58,7 @@ def signup():
                 error = 'An internal server error stopped you from signing up'
     return render_template('signup.html', error=error)
 
+@login_required
 def changePassword():
     '''Logic to change the password of the logged in user'''
     error = None
@@ -84,20 +86,36 @@ def sample_data_returner(filename):
     """ Helper function to return sample data in debug mode """
     return send_from_directory('./angular/sample_data', filename)
 
+@login_required
 def log_data_retriever(collection_name):
     la = LogAnalyzer()
-    data = la.get_log_data(collection_name)
+    data = la.get_log_data(current_user.name+collection_name)
     if data is False:
         return jsonify(dict(status = 'Error', message='The collection does not exist'))
     return data
 
-def upload_file():
-    if request.method == 'POST':
-        file = request.files['file']
-        if file :
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            lp=LogParser()
-            lp.load_apache_log_file_into_DB(app.config['UPLOAD_FOLDER'] + filename, filename)
-            return 'Upload successful, to view the logs at <a href="http://127.0.0.1:5000/#/logviewer/'+filename+'" />Click here</a>'
-    return render_template('upload.html')
+@login_required
+def upload_logset():
+    logset_name = request.form.get('name')
+    new_logset = ApacheAccessLogsetMetadata(\
+                name = logset_name\
+                , creator_name = current_user.email\
+            )
+    uploaded_file = request.files['file']
+    if uploaded_file:
+        filename = secure_filename(uploaded_file.filename)
+        uploaded_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        lp = LogParser()
+        file_location = app.config['UPLOAD_FOLDER'] + filename
+        collection_name = current_user.name + '_' + filename
+        if lp.load_apache_log_file_into_DB(file_location, collection_name) is False:
+            return jsonify(dict(status = 'Error', message='The data was not stored'))
+    new_logset.save()
+    return jsonify(dict(status = 'Success', message = 'Upload successful'))
+
+@login_required
+def get_logsets():
+    names = []
+    for logset in LogsetMetadata.objects(creator_name = current_user.email):
+        names.append(dict( name = logset.name, fields = logset.fields ))
+    return jsonify(dict(data = names))

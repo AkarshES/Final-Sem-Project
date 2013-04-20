@@ -2,8 +2,8 @@
 
 /* Controllers */
 function MainCtrl($scope, $http){
-    $http.get('../sample_data/sample-user-object.json').success(function(response_json, status){
-        $scope.User = response_json;
+    $http.get('/logsets').success(function(response_json, status){
+        $scope.logsets = response_json;
     });
 }
 
