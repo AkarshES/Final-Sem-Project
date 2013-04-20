@@ -11,7 +11,7 @@ from pandas import DataFrame
 class LogParser:
     def __init__(self):
         self.client = MongoClient()
-        self.db = self.client.project_test
+        self.db = self.client.test
     
     def log_insert(self, collection_name, data):
       collection = self.db[collection_name]
