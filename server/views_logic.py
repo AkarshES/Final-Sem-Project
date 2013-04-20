@@ -14,7 +14,7 @@ def signin():
     error = None
     if request.method == 'POST':
         try:
-            user = User.objects.get(email = request.form['email'])
+            user = User.objects.get(name = request.form['name'])
             isCorrectPassword = check_password_hash(user.password_hash, request.form['password'])
             if isCorrectPassword and login_user(user) is True:
                 flash("Logged in successfully.")
@@ -22,7 +22,7 @@ def signin():
             else:
                 error = 'Failed to log in'
         except DoesNotExist:
-            error = 'User with this email id does not exist'
+            error = 'User with this name does not exist'
     return render_template('signin.html', error=error)
 
 @login_required
@@ -37,8 +37,7 @@ def signup():
     error = None
     if request.method == 'POST':
         new_user = User(\
-                email = request.form['email']\
-                , name = request.form['name']\
+                name = request.form['name']\
                 , password_hash = generate_password_hash(request.form['password'])\
                 )
         try:
@@ -47,11 +46,9 @@ def signup():
             flash('successfully signed up')
             return redirect(url_for('signin'))
         except db.NotUniqueError:
-            error = 'User with this email id already exists'
+            error = 'User with this username already exists'
         except ValidationError as e:
-            if e.errors.get('email'):
-                error = 'Invalid email'
-            elif e.errors.get('name'):
+            if e.errors.get('name'):
                 error = 'Invalid name'
             else:
                 app.logger.error('An unknown validation error occured while trying to sign up a user')
@@ -90,6 +87,7 @@ def sample_data_returner(filename):
 def log_data_retriever(collection_name):
     la = LogAnalyzer()
     data = la.get_log_data(current_user.name + '_' + collection_name)
+    app.logger.info(current_user.name + '_' + collection_name)
     if data is False:
         return jsonify(dict(status = 'Error', message='The collection does not exist'))
     return data
@@ -98,8 +96,8 @@ def log_data_retriever(collection_name):
 def upload_logset():
     new_logset = ApacheAccessLogsetMetadata(\
                 name = request.form['name']\
-                , creator_name = current_user.email\
-                , users_with_access = [current_user.email]\
+                , creator_name = current_user.name\
+                , users_with_access = [current_user.name]\
             )
     uploaded_file = request.files['file']
     if uploaded_file:
@@ -116,6 +114,6 @@ def upload_logset():
 @login_required
 def get_logsets():
     names = []
-    for logset in LogsetMetadata.objects(creator_name = current_user.email):
+    for logset in LogsetMetadata.objects(creator_name = current_user.name):
         names.append(dict( name = logset.name, fields = logset.fields ))
     return jsonify(dict(data = names))
