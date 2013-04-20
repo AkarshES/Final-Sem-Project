@@ -7,11 +7,13 @@ import dateutil.parser
 from datetime import datetime
 from pymongo import MongoClient
 from pandas import DataFrame
+from referer_parser import Referer
+from ua_parser import user_agent_parser
 
 class LogParser:
-    def __init__(self):
+    def __init__(self, db = 'test'):
         self.client = MongoClient()
-        self.db = self.client.project_test
+        self.db = self.client[db]
     
     def log_insert(self, collection_name, data):
       collection = self.db[collection_name]
@@ -50,9 +52,9 @@ class LogParser:
         return True
 
 class LogAnalyzer:    
-    def __init__(self):
+    def __init__(self, db = 'test'):
         self.client = MongoClient()
-        self.db = self.client.project_test
+        self.db = self.client[db]
 
     def load_apache_logs_into_DataFrame(self, collection_name):
         fields = ['client_ip','date','request','status','request_size','browser_string']
@@ -85,9 +87,13 @@ class LogAnalyzer:
 
     def user_agent_info(self, collection_name):
         collection = self.db[collection_name]
-        log_data = collection.find().limit(50)
+        log_data = collection.find()
         for log in log_data:
-            print log['browser_string']
+            result_dict = user_agent_parser.Parse(log['browser_string'])
+            referer_url = re.search("(?P<url>https?://[^\s]+)", log['browser_string'])
+            print {'device' : result_dict['device']['family'],'os' : result_dict['os']['family'], 'browser' : result_dict['user_agent']['family']}
+            # if referer_url is not None:
+            #      print Referer(referer_url.group("url")).uri[1]
 
     def median(self, df, mean_of, group_by = None):
         computed_mean = None
@@ -119,17 +125,10 @@ class LogAnalyzer:
         for row in count_data.index:
             counts_list.append({"date" : datetime(row[0][0],row[0][1],row[0][2]).strftime("%s"), "status" : row[1], "count" : str(count_data[row])})
         return json.dumps({"data" : counts_list})
-        # json_data = pandasjson.to_json(self.count(df, 'request_size'))
-        # json_load = json.loads(json_data)
-        # new_json_dict = []
-        # for row in json_load:
-        #     row_list = json.loads(row)
-        #     new_json_dict.append({'date': datetime(row_list[0][0],row_list[0][1],row_list[0][2]).strftime("%s"), 'status':row_list[1], 'count' : json_load[row]})
-        # return json.dumps({"data": new_json_dict})
 
 if __name__ == '__main__':
     # lp = LogParser()
-    # lp.load_apache_log_file_into_DB('access_log_4','access_log_4')
+    # lp.load_apache_log_file_into_DB('access_log_2','access_log')
     la = LogAnalyzer()
-    print la.user_agent_info('access_log_1')
+    print la.user_agent_info('access_log')
     #print la.count_hits('access_log_1')
