@@ -1,11 +1,6 @@
 from flask import Flask, g, request, redirect, url_for,send_from_directory,  render_template
 from flask.ext.login import LoginManager , request, redirect, url_for
 from flask.ext.mongoengine import MongoEngine
-<<<<<<< HEAD:server.py
-from werkzeug import secure_filename, SharedDataMiddleware
-from log_analyzer import LogParser, LogAnalyzer
-=======
->>>>>>> c4e15e7b68a3fe90284c54c75d4cd26f87147af0:server/__init__.py
 import os
 from log_analyzer import LogParser
 
