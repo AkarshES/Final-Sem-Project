@@ -5,9 +5,9 @@ class LogsetMetadata(db.Document):
     An inheritable class that represents the metadata for a logset stored in another location
     '''
     name = db.StringField(required = True)
-    creator_name = db.EmailField(required = True)
+    creator_name = db.StringField(required = True)
     fields = db.ListField(db.StringField())
-    users_with_access = db.ListField(db.EmailField(), required = True)
+    users_with_access = db.ListField(db.StringField(), required = True)
 
     meta = { 'allow_inheritance': True }
 
