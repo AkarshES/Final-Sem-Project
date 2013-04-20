@@ -1,19 +1,24 @@
 from flask import Flask, g, request, redirect, url_for,send_from_directory,  render_template
 from flask.ext.login import LoginManager , request, redirect, url_for
 from flask.ext.mongoengine import MongoEngine
+<<<<<<< HEAD:server.py
 from werkzeug import secure_filename, SharedDataMiddleware
 from log_analyzer import LogParser, LogAnalyzer
+=======
+>>>>>>> c4e15e7b68a3fe90284c54c75d4cd26f87147af0:server/__init__.py
 import os
+from log_analyzer import LogParser
 
 
 UPLOAD_FOLDER = '/var/tmp/'
 #ALLOWED_EXTENSIONS = set(['txt','csv'])
 
 app = Flask(
-        __name__,\
-        static_url_path='',\
-        static_folder = './angular/app/',\
-        template_folder='./angular/app/')
+        __name__\
+        , static_url_path='/static'\
+        , static_folder = '../angular/app/'\
+        , template_folder='../angular/app/jinja-templates'\
+    )
 
 # overriding default jinja template tags, to avoid conflicts with angularjs
 app.jinja_env.variable_start_string = '{['
@@ -30,33 +35,19 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #set up login manager
 login_manager = LoginManager()
-login_manager.setup_app(app)
+login_manager.init_app(app)
 
 #set url to redirect to for login
-login_manager.login_view = '/signin'
+login_manager.login_view = 'signin'
 
 from User import User
 
 #setting up user_loader callback, for Flask login
 @login_manager.user_loader
 def load_user(userid):
-    return User.objects.get(id = userid)
-
-#setting debug here to make sure that some routes are loaded only in debug mode
-app.debug = True
+    try:
+        return User.objects.get(id = userid)
+    except db.DoesNotExist:
+        return None
 
 import views
-
-@app.route('/upload', methods=['GET', 'POST'])
-def upload_file():
-    if request.method == 'POST':
-        file = request.files['file']
-        if file :
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            lp=LogParser()
-            lp.load_apache_log_file_into_DB(UPLOAD_FOLDER + filename,filename)
-            la=LogAnalyzer()
-            la.count_hits(filename)
-            return '''Upload successful'''
-    return render_template('upload.html')

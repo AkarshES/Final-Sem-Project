@@ -1,9 +1,12 @@
-from flask import Response, request, render_template, redirect, url_for, flash, jsonify, send_from_directory
+from flask import Response, request, render_template, redirect, url_for, flash, jsonify, send_from_directory, session
 from flask.ext.mongoengine import DoesNotExist, ValidationError
 from flask.ext.login import login_required, logout_user, login_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug import secure_filename, SharedDataMiddleware
 from server import app, db
 from User import User
+from log_analyzer import LogAnalyzer, LogParser
+import os
 
 def signin():
     """all logic to check whether a user exists and log him in"""
@@ -11,15 +14,17 @@ def signin():
     if request.method == 'POST':
         try:
             user = User.objects.get(email = request.form['email'])
-            if check_password_hash(user.password_hash, request.form['password']) is True:
-                login_user(user)
-                return redirect(url_for('index'))
+            isCorrectPassword = check_password_hash(user.password_hash, request.form['password'])
+            if isCorrectPassword and login_user(user) is True:
+                flash("Logged in successfully.")
+                return redirect(request.args.get("next") or url_for("index"))
             else:
-                error = 'Incorrect Password'
+                error = 'Failed to log in'
         except DoesNotExist:
             error = 'User with this email id does not exist'
     return render_template('signin.html', error=error)
 
+@login_required
 def signout():
     '''all logic to correctly logout a user'''
     logout_user()
@@ -70,6 +75,7 @@ def changePassword():
                 error = 'Failed to save new password, try again later'
     return render_template('changePassword.html', error = error)
 
+@login_required
 def index():
     """ The main page """
     return render_template('index.html')
@@ -78,12 +84,20 @@ def sample_data_returner(filename):
     """ Helper function to return sample data in debug mode """
     return send_from_directory('./angular/sample_data', filename)
 
-app.add_url_rule('/signin', view_func=signin, methods=['GET', 'POST'])
-app.add_url_rule('/signout', view_func=signout)
-app.add_url_rule('/signup', view_func=signup, methods=['GET', 'POST'])
-app.add_url_rule('/changePassword', view_func=changePassword, methods=['GET', 'POST'])
+def log_data_retriever(collection_name):
+    la = LogAnalyzer()
+    data = la.get_log_data(collection_name)
+    if data is False:
+        return jsonify(dict(status = 'Error', message='The collection does not exist'))
+    return data
 
-app.add_url_rule('/', view_func=index)
-
-if app.debug is True:
-    app.add_url_rule('/sample_data/<path:filename>', view_func=sample_data_returner)
+def upload_file():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file :
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            lp=LogParser()
+            lp.load_apache_log_file_into_DB(app.config['UPLOAD_FOLDER'] + filename, filename)
+            return 'Upload successful, to view the logs at <a href="http://127.0.0.1:5000/#/logviewer/'+filename+'" />Click here</a>'
+    return render_template('upload.html')

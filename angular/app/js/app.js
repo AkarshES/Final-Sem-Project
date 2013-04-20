@@ -6,11 +6,19 @@ var App = angular.module('App', ['ngResource']);
 App.config(['$routeProvider', function($routeProvider) {
     $routeProvider
         .when('/',{
-            templateUrl:"partials/main.html"
+            templateUrl:"static/partials/main.html"
         })
         .when('/logviewer/:table_name',{
-            templateUrl:"partials/logViewer.html",
+            templateUrl:"static/partials/logViewer.html",
             controller:"LogViewerCtrl"
+        })
+        .when('/AddNewTable', {
+            templateUrl:'static/partials/fileUpload.html',
+            controller:"AddTableCtrl"
+        })
+        .when('/AddNewTable/:table_name', {
+            templateUrl:'static/partials/fileUpload.html',
+            controller:"AddTableCtrl"
         })
         .otherwise({
             redirectTo:'/'

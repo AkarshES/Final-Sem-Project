@@ -7,12 +7,11 @@ import dateutil.parser
 from datetime import datetime
 from pymongo import MongoClient
 from pandas import DataFrame
-import pandasjson
 
 class LogParser:
     def __init__(self):
         self.client = MongoClient()
-        self.db = self.client.project_test
+        self.db = self.client.test
     
     def log_insert(self, collection_name, data):
       collection = self.db[collection_name]
@@ -24,33 +23,43 @@ class LogParser:
         """
         fields = ['client_ip','date','request','status','request_size','browser_string']
         apache_log_regex = '([(\da-zA-Z:\.\-)]+) - - \[(.*?)\] "(.*?)" (\d+) ((\d+)|-) ("-")?(.*?) "(.*?)"'
+        compiled_apache_log_regex = re.compile(apache_log_regex)
         log_file = open(file_name,"r")
+        count = 0
+        log_list = []
         for line in log_file.readlines():
             try:
-                search = re.match(apache_log_regex, line).groups()
+                search = compiled_apache_log_regex.match(line).groups()
                 date = dateutil.parser.parse(search[1].replace(':', ' ', 1))
                 date = (datetime(date.year,date.month,date.day,date.hour,date.minute,date.second),)
                 path = (search[2].split()[1],)
                 log_data = dict(zip(fields,search[:1]+date+path+search[3:5]+search[8:]))
                 if(log_data['request_size'] == '-'):
                     log_data['request_size'] = 0
-                self.log_insert(collection_name,log_data)
+                count += 1
+                log_list.append(log_data)
+                if count == 400:
+                    count = 0
+                    self.log_insert(collection_name,log_list)
+                    log_list = []
             except :
                 print line
                 return False
+        if len(log_data) > 0:
+            self.log_insert(collection_name,log_list)
         return True
 
 class LogAnalyzer:    
     def __init__(self):
         self.client = MongoClient()
-        self.db = self.client.project_test
+        self.db = self.client.test
 
     def load_apache_logs_into_DataFrame(self, collection_name):
         fields = ['client_ip','date','request','status','request_size','browser_string']
         if collection_name not in self.db.collection_names():
             return False
         collection = self.db[collection_name]
-        log_data = collection.find().limit(50)
+        log_data = collection.find()
         return DataFrame(list(log_data),columns = fields)
 
     def get_log_data(self, collection_name):
@@ -65,6 +74,20 @@ class LogAnalyzer:
             log['date'] = log['date'].strftime("%s")
             log.pop('_id')
         return json.dumps({"data" : log_list})
+
+    def get_log_date_limits(self, collection_name):
+        if collection_name not in self.db.collection_names():
+            return False
+        collection = self.db[collection_name]
+        min = collection.find().sort([("date", 1)]).limit(1)
+        max = collection.find().sort([("date", -1)]).limit(1)
+        return {"min_date" : min[0]['date'],"max_date" : max[0]['date']}
+
+    def user_agent_info(self, collection_name):
+        collection = self.db[collection_name]
+        log_data = collection.find().limit(50)
+        for log in log_data:
+            print log['browser_string']
 
     def median(self, df, mean_of, group_by = None):
         computed_mean = None
@@ -105,8 +128,8 @@ class LogAnalyzer:
         # return json.dumps({"data": new_json_dict})
 
 if __name__ == '__main__':
-    # lp = LogParser()
-    # lp.load_apache_log_file_into_DB('access_log_3','access_log_3')
-    la = LogAnalyzer()
-    print la.get_log_data('access_log_1')
-    # print la.count_hits('access_log_1')
+    lp = LogParser()
+    lp.load_apache_log_file_into_DB('access_log_4','access_log_4')
+    #la = LogAnalyzer()
+    #print la.user_agent_info('access_log_1')
+    #print la.count_hits('access_log_1')
