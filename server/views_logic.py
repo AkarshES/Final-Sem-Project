@@ -89,7 +89,7 @@ def sample_data_returner(filename):
 @login_required
 def log_data_retriever(collection_name):
     la = LogAnalyzer()
-    data = la.get_log_data(current_user.name+collection_name)
+    data = la.get_log_data(current_user.name + '_' + collection_name)
     if data is False:
         return jsonify(dict(status = 'Error', message='The collection does not exist'))
     return data
@@ -107,7 +107,7 @@ def upload_logset():
         uploaded_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         lp = LogParser()
         file_location = app.config['UPLOAD_FOLDER'] + filename
-        collection_name = current_user.name + '_' + filename
+        collection_name = current_user.name + '_' + request.form['name']
         if lp.load_apache_log_file_into_DB(file_location, collection_name) is False:
             return jsonify(dict(status = 'Error', message='The data was not stored'))
     new_logset.save()
