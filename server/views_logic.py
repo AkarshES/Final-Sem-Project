@@ -96,10 +96,10 @@ def log_data_retriever(collection_name):
 
 @login_required
 def upload_logset():
-    logset_name = request.form.get('name')
     new_logset = ApacheAccessLogsetMetadata(\
-                name = logset_name\
+                name = request.form['name']\
                 , creator_name = current_user.email\
+                , users_with_access = [current_user.email]\
             )
     uploaded_file = request.files['file']
     if uploaded_file:

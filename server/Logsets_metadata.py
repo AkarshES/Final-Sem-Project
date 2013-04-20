@@ -7,7 +7,7 @@ class LogsetMetadata(db.Document):
     name = db.StringField(required = True)
     creator_name = db.EmailField(required = True)
     fields = db.ListField(db.StringField())
-    users_with_access = db.ListField(db.EmailField, required = True, default = [creator_name])
+    users_with_access = db.ListField(db.EmailField(), required = True)
 
     meta = { 'allow_inheritance': True }
 
