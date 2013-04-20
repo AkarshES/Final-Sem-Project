@@ -3,7 +3,7 @@
 /* Controllers */
 function MainCtrl($scope, $http){
     $http.get('/logsets').success(function(response_json, status){
-        $scope.logsets = response_json;
+        $scope.logsets = response_json.data;
     });
 }
 
