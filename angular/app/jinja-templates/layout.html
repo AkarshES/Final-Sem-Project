@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" ng-app="App">
+  <head>
+    <meta charset="utf-8">
+    <title>Project</title>
+    <link rel="stylesheet" href="static/css/bootstrap.css"/>
+    <link rel="stylesheet" href="static/css/app.css"/>
+  </head>
+  <body ng-controller="MainCtrl">
+    <div class="navbar navbar-fixed-top navbar-inverse">
+      <div class="navbar-inner">
+        <a href="#" class="brand">Project name</a>
+        <ul class="nav pull-right">
+        {% if current_user.is_authenticated %}
+          <li><a href="#">{[ current_user.name ]}</a></li>
+          <li><a href="/signout">Sign out</a></li>
+        {% else %}
+          <li><a href="/signin">Sign In</a></li>
+          <li><a href="/signup">Sign Up</a></li>
+        {% endif %}
+        </ul>
+      </div>
+    </div>
+    {% for message in get_flashed_messages() %}
+    <div class="span5 offset3 alert alert-info fade in" >
+      <span>{[ message ]}</span>
+      <button type="button" class="close" data-dismiss="alert">×</button>
+    </div>
+    {% endfor %}
+    <br />
+    {% if error %} 
+    <div class="span5 offset3 alert alert-error fade in" >
+      <button type="button" class="close" data-dismiss="alert">×</button>
+      <span>{[ error ]}</span>
+    </div> 
+    {% endif %}
+    <div class="row">
+      {% block body %}{% endblock%}
+    </div>
+    <!-- In production use:
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular.min.js"></script>
+    -->
+    <script src="static/lib/angular/angular.js"></script>
+    <script src="static/js/bootstrap.js"></script>
+    {% block scripts %}{% endblock%}
+  </body>
+</html>
