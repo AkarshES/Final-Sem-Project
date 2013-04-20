@@ -11,7 +11,7 @@ from pandas import DataFrame
 class LogParser:
     def __init__(self):
         self.client = MongoClient()
-        self.db = self.client.test
+        self.db = self.client.project_test
     
     def log_insert(self, collection_name, data):
       collection = self.db[collection_name]
@@ -45,14 +45,14 @@ class LogParser:
             except :
                 print line
                 return False
-        if len(log_data) > 0:
+        if len(log_list) > 0:
             self.log_insert(collection_name,log_list)
         return True
 
 class LogAnalyzer:    
     def __init__(self):
         self.client = MongoClient()
-        self.db = self.client.test
+        self.db = self.client.project_test
 
     def load_apache_logs_into_DataFrame(self, collection_name):
         fields = ['client_ip','date','request','status','request_size','browser_string']
@@ -128,8 +128,8 @@ class LogAnalyzer:
         # return json.dumps({"data": new_json_dict})
 
 if __name__ == '__main__':
-    lp = LogParser()
-    lp.load_apache_log_file_into_DB('access_log_4','access_log_4')
-    #la = LogAnalyzer()
-    #print la.user_agent_info('access_log_1')
+    # lp = LogParser()
+    # lp.load_apache_log_file_into_DB('access_log_4','access_log_4')
+    la = LogAnalyzer()
+    print la.user_agent_info('access_log_1')
     #print la.count_hits('access_log_1')
