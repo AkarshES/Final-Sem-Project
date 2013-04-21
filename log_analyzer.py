@@ -29,7 +29,7 @@ class LogParser:
         log_file = open(file_name,"r")
         count = 0
         log_list = []
-        for line in log_file.readlines():
+        for line in log_file.readlines()[:50]:
             try:
                 search = compiled_apache_log_regex.match(line).groups()
                 date = dateutil.parser.parse(search[1].replace(':', ' ', 1))
@@ -38,6 +38,7 @@ class LogParser:
                 log_data = dict(zip(fields,search[:1]+date+path+search[3:5]+search[8:]))
                 if(log_data['request_size'] == '-'):
                     log_data['request_size'] = 0
+                log_data['user_agent_info'] = self.extract_user_agent_info(log_data['browser_string'])
                 count += 1
                 log_list.append(log_data)
                 if count == 400:
@@ -51,13 +52,21 @@ class LogParser:
             self.log_insert(collection_name,log_list)
         return True
 
+    def extract_user_agent_info(self, ua_string):
+        result_dict = user_agent_parser.Parse(ua_string)
+        referer_url = re.search("(?P<url>https?://[^\s]+)", ua_string)
+        ua_info_dict = {'device' : result_dict['device']['family'],'os' : result_dict['os']['family'], 'browser' : result_dict['user_agent']['family']}
+        if referer_url is not None:
+            ua_info_dict['referer'] = Referer(referer_url.group("url")).uri[1]
+        return ua_info_dict
+
 class LogAnalyzer:    
     def __init__(self, db = 'test'):
         self.client = MongoClient()
         self.db = self.client[db]
 
     def load_apache_logs_into_DataFrame(self, collection_name):
-        fields = ['client_ip','date','request','status','request_size','browser_string']
+        fields = ['client_ip','date','request','status','request_size','browser_string','user_agent_info']
         if collection_name not in self.db.collection_names():
             return False
         collection = self.db[collection_name]
@@ -77,7 +86,7 @@ class LogAnalyzer:
             log.pop('_id')
         return json.dumps({"data" : log_list})
 
-    def get_log_date_limits(self, collection_name):
+    def get_log_date_range(self, collection_name):
         if collection_name not in self.db.collection_names():
             return False
         collection = self.db[collection_name]
@@ -85,15 +94,6 @@ class LogAnalyzer:
         max = collection.find().sort([("date", -1)]).limit(1)
         return {"min_date" : min[0]['date'],"max_date" : max[0]['date']}
 
-    def user_agent_info(self, collection_name):
-        collection = self.db[collection_name]
-        log_data = collection.find()
-        for log in log_data:
-            result_dict = user_agent_parser.Parse(log['browser_string'])
-            referer_url = re.search("(?P<url>https?://[^\s]+)", log['browser_string'])
-            print {'device' : result_dict['device']['family'],'os' : result_dict['os']['family'], 'browser' : result_dict['user_agent']['family']}
-            # if referer_url is not None:
-            #      print Referer(referer_url.group("url")).uri[1]
 
     def median(self, df, mean_of, group_by = None):
         computed_mean = None
@@ -115,6 +115,13 @@ class LogAnalyzer:
     def group_by(self, df, field):
         return df.groupby(df[field])
     
+    def generate_stats(self, collection_name):
+        if collection_name not in self.db.collection_names():
+            return False
+        stats_dict = {}
+        stats_dict['date_range'] = self.get_log_date_range(collection_name)
+
+
     def count_hits(self, collection_name):
         df = self.load_apache_logs_into_DataFrame(collection_name)
         if df is False:
@@ -128,7 +135,9 @@ class LogAnalyzer:
 
 if __name__ == '__main__':
     # lp = LogParser()
-    # lp.load_apache_log_file_into_DB('access_log_2','access_log')
+    # lp.load_apache_log_file_into_DB('access_log_1','access_log')
     la = LogAnalyzer()
-    print la.user_agent_info('access_log')
-    #print la.count_hits('access_log_1')
+    #print la.count_hits('access_log')
+    df = la.load_apache_logs_into_DataFrame('access_log')
+    data = la.group_by(df, 'user_agent_info')
+    print la.median(data, 'request_size')
