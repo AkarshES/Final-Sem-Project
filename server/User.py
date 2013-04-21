@@ -5,6 +5,5 @@ class User(db.Document, UserMixin):
     '''
     A class that represents users who will use this system
     '''
-    name = db.StringField(required = True)
-    email = db.EmailField(required = True, unique = True)
+    name = db.StringField(required = True, unique = True)
     password_hash = db.StringField(max_length = 160)
