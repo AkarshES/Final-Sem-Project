@@ -73,12 +73,16 @@ class LogAnalyzer:
         log_data = collection.find()
         return DataFrame(list(log_data),columns = fields)
 
-    def get_log_data(self, collection_name):
+    def get_log_data(self, collection_name, from_date = None, to_date = None):
         fields = ['client_ip','date','request','status','request_size','browser_string']
+        if from_date is None:
+            from_date = datetime(1970,1,1)
+        if to_date is None:
+            to_date = datetime.now()
         if collection_name not in self.db.collection_names():
             return False
         collection = self.db[collection_name]
-        log_data = collection.find().limit(50)
+        log_data = collection.find({'date' : {"$gte": from_date, "$lt" : to_date}}).limit(50)
         log_list = []
         for log in log_data:
             log_list.append(log)
@@ -138,6 +142,7 @@ if __name__ == '__main__':
     # lp.load_apache_log_file_into_DB('access_log_1','access_log')
     la = LogAnalyzer()
     #print la.count_hits('access_log')
-    df = la.load_apache_logs_into_DataFrame('access_log')
-    data = la.group_by(df, 'user_agent_info')
-    print la.median(data, 'request_size')
+    # df = la.load_apache_logs_into_DataFrame('access_log')
+    # data = la.group_by(df, 'user_agent_info')
+    # print la.median(data, 'request_size')
+    print la.get_log_data('access_log')
