@@ -6,13 +6,13 @@
             <th>Table</th>
             <th>Operations</th>
         </tr>
-        <tr ng-repeat="table_name in User.tables">
-            <td>{{table_name}}</td>
+        <tr ng-repeat="logset in logsets">
+            <td>{{logset.name}}</td>
             <td>
-                <a href="#/logviewer/{{table_name}}">View logs</a>
+                <a href="#/logviewer/{{logset.name}}">View logs</a>
             </td>
             <td>
-                <a href="#/AddNewTable/{{table_name}}">Add logs</a>
+                <a href="#/AddNewTable/{{logset.name}}">Add logs</a>
             </td>
         </tr>
     </table>
