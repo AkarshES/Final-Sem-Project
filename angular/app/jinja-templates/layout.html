@@ -11,7 +11,7 @@
       <div class="navbar-inner">
         <a href="#" class="brand">Project name</a>
         <ul class="nav pull-right">
-        {% if current_user.is_authenticated %}
+        {% if current_user.is_authenticated() %}
           <li><a href="#">{[ current_user.name ]}</a></li>
           <li><a href="/signout">Sign out</a></li>
         {% else %}
