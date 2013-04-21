@@ -87,7 +87,6 @@ def sample_data_returner(filename):
 def log_data_retriever(collection_name):
     la = LogAnalyzer()
     data = la.get_log_data(current_user.name + '_' + collection_name)
-    app.logger.info(current_user.name + '_' + collection_name)
     if data is False:
         return jsonify(dict(status = 'Error', message='The collection does not exist'))
     return data
