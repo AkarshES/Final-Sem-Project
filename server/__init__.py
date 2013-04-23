@@ -1,6 +1,6 @@
 from flask import Flask, g, request, redirect, url_for,send_from_directory,  render_template
 from flask.ext.login import LoginManager , request, redirect, url_for
-from flask.ext.mongoengine import MongoEngine
+from flask.ext.mongoengine import MongoEngine, DoesNotExist
 import os
 from log_analyzer import LogParser
 
@@ -42,7 +42,7 @@ from User import User
 def load_user(userid):
     try:
         return User.objects.get(id = userid)
-    except db.DoesNotExist:
+    except DoesNotExist:
         return None
 
 import views
