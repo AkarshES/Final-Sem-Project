@@ -3,6 +3,24 @@
 </h1>
 <div class="well well-small">
     <form class="form-inline">
+        <label for="from_date">From</label>
+        <div class="control-group input-append">
+          <input type="text" class="input-small" id="from_date" ng-model="from.date" data-date-format="dd/mm/yyyy" bs-datepicker>
+          <button type="button" class="btn" data-toggle="datepicker"><i class="icon-calendar"></i></button>
+        </div>
+        <div class="control-group input-append">
+          <input type="text" class="input-mini" ng-model="from.time" bs-timepicker>
+          <button type="button" class="btn" data-toggle="timepicker"><i class="icon-time"></i></buttoni>
+        </div>
+        <label for="to_date">To</label>
+        <div class="control-group input-append">
+          <input type="text" class="input-small" id="to_date" ng-model="to.date" data-date-format="dd/mm/yyyy" bs-datepicker>
+          <button type="button" class="btn" data-toggle="datepicker"><i class="icon-calendar"></i></button>
+        </div>
+        <div class="control-group input-append">
+          <input type="text" class="input-mini" ng-model="to.time" bs-timepicker>
+          <button type="button" class="btn" data-toggle="timepicker"><i class="icon-time"></i></buttoni>
+        </div>
         <h4>Filter by:</h4>
         <label for="client_ip_query">IP:</label>
         <input type="text" class="input-medium" id="client_ip_query" ng-model="log_row.client_ip" />
