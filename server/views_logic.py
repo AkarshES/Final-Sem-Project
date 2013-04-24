@@ -86,7 +86,9 @@ def sample_data_returner(filename):
 @login_required
 def log_data_retriever(collection_name):
     la = LogAnalyzer()
-    data = la.get_log_data(current_user.name + '_' + collection_name)
+    from_date = request.args.get('from')
+    to_date = request.args.get('to')
+    data = la.get_log_data(current_user.name + '_' + collection_name, from_date = from_date, to_date = to_date)
     if data is False:
         return jsonify(dict(status = 'Error', message='The collection does not exist'))
     return data
