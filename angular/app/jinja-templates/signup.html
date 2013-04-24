@@ -2,6 +2,7 @@
 {% block body %}
   <div id="login-box">
     <div class="well span4 offset4">
+ <!--
       <form action="{[ url_for('signup') ]}" method=post>
         <h3>Sign up</h3>
         <label for="name">Name:</label>
@@ -11,6 +12,17 @@
         <br />
         <input class="btn btn-large btn-success" type="submit" value="Sign in">
       </form>
+-->
+         <form class="form-signup" action="{[ url_for('signup') ]}" method=post>
+        <h2 class="form-signin-heading">Sign up</h2>
+                <label for="name">Username</label>
+        <input type="text" class="input-block-level" name="name" required autofoucs>
+                <label for="name">Password</label>
+        <input type="password" class="input-block-level" name="password" required>
+        
+        <button class="btn btn-large btn-success" type="submit">Sign up</button>
+      </form>
+
     </div>
   </div>
 {% endblock %}
