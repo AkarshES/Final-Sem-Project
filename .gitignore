@@ -1,5 +1,6 @@
-# ignoring access_log files
+# ignoring sample data files
 access_log*
+GeoIP.dat
 
 # used by virtualenv
 venv

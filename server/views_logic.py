@@ -8,6 +8,7 @@ from User import User
 from Logsets_metadata import ApacheAccessLogsetMetadata, LogsetMetadata
 from log_analyzer import LogAnalyzer, LogParser
 import os
+from datetime import datetime
 
 def signin():
     """all logic to check whether a user exists and log him in"""
@@ -86,7 +87,16 @@ def sample_data_returner(filename):
 @login_required
 def log_data_retriever(collection_name):
     la = LogAnalyzer()
-    data = la.get_log_data(current_user.name + '_' + collection_name)
+    from_date = to_date = None
+    if request.args.get('from'):
+        from_date = datetime.strptime(request.args.get('from'), "%d/%m/%Y %I:%M %p")
+    if request.args.get('from'):
+        to_date = datetime.strptime(request.args.get('to'), "%d/%m/%Y %I:%M %p")
+    data = la.get_log_data(\
+            current_user.name + '_' + collection_name\
+            , from_date = from_date\
+            , to_date = to_date\
+            )
     if data is False:
         return jsonify(dict(status = 'Error', message='The collection does not exist'))
     return data
@@ -113,6 +123,11 @@ def upload_logset():
 @login_required
 def get_logsets():
     names = []
+    la = LogAnalyzer()
     for logset in LogsetMetadata.objects(creator_name = current_user.name):
-        names.append(dict( name = logset.name, fields = logset.fields ))
+        names.append(dict(\
+                name = logset.name\
+                , fields = logset.fields\
+                , date_range = la.get_log_date_range(current_user.name + '_' + logset.name)\
+                ))
     return jsonify(dict(data = names))
