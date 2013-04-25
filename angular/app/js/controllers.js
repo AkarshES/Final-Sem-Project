@@ -30,13 +30,12 @@ function LogViewerCtrl($scope, $http, $routeParams, $filter){
         });
     }
 
-    //TODO:set default values and retrieve logs
     $scope.from_time = "12:00 AM";
     $scope.to_time = "12:00 AM";
     $scope.min_date = moment.unix($scope.logset.date_range.min_date);
     $scope.max_date = moment.unix($scope.logset.date_range.max_date);
     $scope.to_date = $scope.max_date.format("DD/MM/YYYY");
-    $scope.from_date = $scope.max_date.subtract('days', 7).format("DD/MM/YYYY");
+    $scope.from_date = moment($scope.max_date).subtract('days', 7).format("DD/MM/YYYY");
     $scope.retrieve_logs();
 }
 
