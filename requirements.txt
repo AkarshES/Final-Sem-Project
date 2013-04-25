@@ -13,3 +13,4 @@ wsgiref==0.1.2
 referer-parser==0.1.0
 pyyaml==3.10
 user-agents==0.1.1
+pygeoip==0.2.6
