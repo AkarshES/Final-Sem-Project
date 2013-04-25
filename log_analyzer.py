@@ -99,7 +99,7 @@ class LogAnalyzer:
         collection = self.db[collection_name]
         min = collection.find().sort([("date", 1)]).limit(1)
         max = collection.find().sort([("date", -1)]).limit(1)
-        return json.dumps({"min_date" : min[0]['date'],"max_date" : max[0]['date']})
+        return json.dumps({"date_range":{"min_date" : min[0]['date'],"max_date" : max[0]['date']}})
 
 
     def median(self, df, mean_of, group_by = None):
