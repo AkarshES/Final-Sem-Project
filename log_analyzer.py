@@ -9,11 +9,12 @@ from pymongo import MongoClient
 from pandas import DataFrame
 from referer_parser import Referer
 from ua_parser import user_agent_parser
-
+import pygeoip
 class LogParser:
     def __init__(self, db = 'test'):
         self.client = MongoClient()
         self.db = self.client[db]
+        self.geoip = pygeoip.GeoIP('/vagrant/Final-Sem-Project/GeoIP.dat', pygeoip.MEMORY_CACHE) # change the path on your machine. get it from http://dev.maxmind.com/geoip/install/country
     
     def log_insert(self, collection_name, data):
       collection = self.db[collection_name]
@@ -23,13 +24,13 @@ class LogParser:
         """
         Reads the log data from 'file_name' and loads it into 'collection_name' in MongoDB
         """
-        fields = ['client_ip','date','request','status','request_size','browser_string']
+        fields = ['client_ip','date','request','status','request_size','browser_string','device' ,'os','browser','referer', 'request_country']
         apache_log_regex = '([(\da-zA-Z:\.\-)]+) - - \[(.*?)\] "(.*?)" (\d+) ((\d+)|-) ("-")?(.*?) "(.*?)"'
         compiled_apache_log_regex = re.compile(apache_log_regex)
         log_file = open(file_name,"r")
         count = 0
         log_list = []
-        for line in log_file.readlines()[:50]:
+        for line in log_file.readlines():
             try:
                 search = compiled_apache_log_regex.match(line).groups()
                 date = dateutil.parser.parse(search[1].replace(':', ' ', 1))
@@ -38,7 +39,9 @@ class LogParser:
                 log_data = dict(zip(fields,search[:1]+date+path+search[3:5]+search[8:]))
                 if(log_data['request_size'] == '-'):
                     log_data['request_size'] = 0
-                log_data['user_agent_info'] = self.extract_user_agent_info(log_data['browser_string'])
+                log_data.update(self.extract_user_agent_info(log_data['browser_string']))
+                request_country = self.geoip.country_name_by_addr(search[0])
+                log_data.update({'request_country' : request_country})
                 count += 1
                 log_list.append(log_data)
                 if count == 400:
@@ -66,7 +69,7 @@ class LogAnalyzer:
         self.db = self.client[db]
 
     def load_apache_logs_into_DataFrame(self, collection_name):
-        fields = ['client_ip','date','request','status','request_size','browser_string','user_agent_info']
+        fields = ['client_ip','date','request','status','request_size','browser_string','device' ,'os','browser','referer', 'request_country']
         if collection_name not in self.db.collection_names():
             return False
         collection = self.db[collection_name]
@@ -74,7 +77,7 @@ class LogAnalyzer:
         return DataFrame(list(log_data),columns = fields)
 
     def get_log_data(self, collection_name, from_date = None, to_date = None):
-        fields = ['client_ip','date','request','status','request_size','browser_string']
+        fields = ['client_ip','date','request','status','request_size','browser_string','device' ,'os','browser','referer', 'request_country']
         if from_date is None:
             from_date = datetime(1970,1,1)
         if to_date is None:
@@ -96,7 +99,7 @@ class LogAnalyzer:
         collection = self.db[collection_name]
         min = collection.find().sort([("date", 1)]).limit(1)
         max = collection.find().sort([("date", -1)]).limit(1)
-        return {"min_date" : min[0]['date'],"max_date" : max[0]['date']}
+        return json.dumps({"min_date" : min[0]['date'],"max_date" : max[0]['date']})
 
 
     def median(self, df, mean_of, group_by = None):
@@ -138,11 +141,15 @@ class LogAnalyzer:
         return json.dumps({"data" : counts_list})
 
 if __name__ == '__main__':
-    # lp = LogParser()
-    # lp.load_apache_log_file_into_DB('access_log_1','access_log')
-    la = LogAnalyzer()
+    lp = LogParser()
+    lp.load_apache_log_file_into_DB('access_log_2','access_log')
+    lp.load_apache_log_file_into_DB('access_log_3','access_log')
+    lp.load_apache_log_file_into_DB('access_log_4','access_log')
+    # la = LogAnalyzer()
+    # print la.get_log_data('access_log')
     #print la.count_hits('access_log')
     # df = la.load_apache_logs_into_DataFrame('access_log')
-    # data = la.group_by(df, 'user_agent_info')
+    # data = la.group_by(df, 'device')
+    # print la.count(data, 'device')
     # print la.median(data, 'request_size')
-    print la.get_log_data('access_log')
+    # print la.get_log_date_range('access_log')
