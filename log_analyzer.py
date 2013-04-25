@@ -99,7 +99,7 @@ class LogAnalyzer:
         collection = self.db[collection_name]
         min = collection.find().sort([("date", 1)]).limit(1)
         max = collection.find().sort([("date", -1)]).limit(1)
-        return json.dumps({"date_range":{"min_date" : min[0]['date'].strftime("%s"),"max_date" : max[0]['date'].strftime("%s")}})
+        return {"min_date" : min[0]['date'].strftime("%s"),"max_date" : max[0]['date'].strftime("%s")}
 
 
     def median(self, df, mean_of, group_by = None):
@@ -141,15 +141,15 @@ class LogAnalyzer:
         return json.dumps({"data" : counts_list})
 
 if __name__ == '__main__':
-    lp = LogParser()
+    # lp = LogParser()
     # lp.load_apache_log_file_into_DB('access_log_2','access_log')
     # lp.load_apache_log_file_into_DB('access_log_3','access_log')
     # lp.load_apache_log_file_into_DB('access_log_4','access_log')
     la = LogAnalyzer()
     # print la.get_log_data('access_log')
     #print la.count_hits('access_log')
-    # df = la.load_apache_logs_into_DataFrame('access_log')
-    # data = la.group_by(df, 'device')
-    # print la.count(data, 'device')
+    df = la.load_apache_logs_into_DataFrame('access_log')
+    data = la.group_by(df, 'device')
+    print la.count(df, 'device')
     # print la.median(data, 'request_size')
-    print la.get_log_date_range('access_log')
+    # print la.get_log_date_range('access_log')
