@@ -14,7 +14,7 @@ class LogParser:
     def __init__(self, db = 'test'):
         self.client = MongoClient()
         self.db = self.client[db]
-        self.geoip = pygeoip.GeoIP('/vagrant/Final-Sem-Project/GeoIP.dat', pygeoip.MEMORY_CACHE) # change the path on your machine. get it from http://dev.maxmind.com/geoip/install/country
+        self.geoip = pygeoip.GeoIP('./GeoIP.dat', pygeoip.MEMORY_CACHE) # change the path on your machine. get it from http://dev.maxmind.com/geoip/install/country
     
     def log_insert(self, collection_name, data):
       collection = self.db[collection_name]
@@ -76,7 +76,7 @@ class LogAnalyzer:
         log_data = collection.find()
         return DataFrame(list(log_data),columns = fields)
 
-    def get_log_data(self, collection_name, from_date = None, to_date = None):
+    def get_log_data(self, collection_name, from_date = None, to_date = None, page_number = 0):
         fields = ['client_ip','date','request','status','request_size','browser_string','device' ,'os','browser','referer', 'request_country']
         if from_date is None:
             from_date = datetime(1970,1,1)
@@ -85,7 +85,7 @@ class LogAnalyzer:
         if collection_name not in self.db.collection_names():
             return False
         collection = self.db[collection_name]
-        log_data = collection.find({'date' : {"$gte": from_date, "$lt" : to_date}}).limit(50)
+        log_data = collection.find({'date' : {"$gte": from_date, "$lt" : to_date}}).skip(page_number * 50).limit(50)
         log_list = []
         for log in log_data:
             log_list.append(log)
@@ -144,34 +144,3 @@ class LogAnalyzer:
         for row in count_data.index:
             counts_list.append({"date" : datetime(row[0][0],row[0][1],row[0][2]).strftime("%s"), "status" : row[1], "count" : str(count_data[row])})
         return json.dumps({"data" : counts_list})
-
-if __name__ == '__main__':
-    # lp = LogParser()
-    # lp.load_apache_log_file_into_DB('access_log_1','access_log')
-    # lp.load_apache_log_file_into_DB('access_log_2','access_log')
-    # lp.load_apache_log_file_into_DB('access_log_3','access_log')
-    # lp.load_apache_log_file_into_DB('access_log_4','access_log')
-    la = LogAnalyzer()
-    # print la.get_log_data('access_log')
-    # #print la.count_hits('access_log')
-    df = la.load_apache_logs_into_DataFrame('access_log')
-    data = la.group_by(df, 'referer')
-    data = la.count(data, 'referer')
-    print data
-    data = la.group_by(df, 'os')
-    data = la.count(data, 'os')
-    print data
-    data = la.group_by(df, 'request_country')
-    data = la.count(data, 'request_country')
-    print data
-    data = la.group_by(df, 'browser')
-    data = la.count(data, 'browser')
-    print data
-    data = la.group_by(df, 'device')
-    data = la.count(data, 'device')
-    print data
-
-
-    # print la.to_json(data)
-    # # print la.median(data, 'request_size')
-    # # print la.get_log_date_range('access_log')
