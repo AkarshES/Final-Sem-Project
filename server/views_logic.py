@@ -89,9 +89,9 @@ def log_data_retriever(collection_name):
     la = LogAnalyzer()
     from_date = to_date = None
     if request.args.get('from'):
-        from_date = datetime.strptime(request.args.get('from'), "%d/%m/%Y %I:%M %p")
+        from_date = datetime.fromtimestamp(int( request.args.get('from') ))
     if request.args.get('from'):
-        to_date = datetime.strptime(request.args.get('to'), "%d/%m/%Y %I:%M %p")
+        to_date = datetime.fromtimestamp(int( request.args.get('to') ))
     data = la.get_log_data(\
             current_user.name + '_' + collection_name\
             , from_date = from_date\
