@@ -25,7 +25,7 @@ class LogParser:
         Reads the log data from 'file_name' and loads it into 'collection_name' in MongoDB
         """
         fields = ['client_ip','date','request','status','request_size','browser_string','device' ,'os','browser','referer', 'request_country']
-        apache_log_regex = '([(\da-zA-Z:\.\-)]+) - - \[(.*?)\] "(.*?)" (\d+) ((\d+)|-) ("-")?(.*?) "(.*?)"'
+        apache_log_regex = '([\da-zA-Z:\.\-]+) - - \[(.*?)\] "(.*?)" (\d+) ((\d+)|-) ("-")?(.*?) "(.*?)"'
         compiled_apache_log_regex = re.compile(apache_log_regex)
         log_file = open(file_name,"r")
         count = 0
@@ -50,7 +50,7 @@ class LogParser:
                     log_list = []
             except :
                 print line
-                return False
+                #return False
         if len(log_list) > 0:
             self.log_insert(collection_name,log_list)
         return True
@@ -128,7 +128,12 @@ class LogAnalyzer:
         stats_dict = {}
         stats_dict['date_range'] = self.get_log_date_range(collection_name)
 
-
+    def to_json(self, data):
+        data_list = []
+        for row in data.index:
+            data_list.append({"key":row[1], "value":data[row]})
+            print {"key":row.encode("ascii","ignore"), "value":str(data[row])}
+        return json.dumps({"data" : data_list})
     def count_hits(self, collection_name):
         df = self.load_apache_logs_into_DataFrame(collection_name)
         if df is False:
@@ -142,14 +147,31 @@ class LogAnalyzer:
 
 if __name__ == '__main__':
     # lp = LogParser()
+    # lp.load_apache_log_file_into_DB('access_log_1','access_log')
     # lp.load_apache_log_file_into_DB('access_log_2','access_log')
     # lp.load_apache_log_file_into_DB('access_log_3','access_log')
     # lp.load_apache_log_file_into_DB('access_log_4','access_log')
     la = LogAnalyzer()
     # print la.get_log_data('access_log')
-    #print la.count_hits('access_log')
+    # #print la.count_hits('access_log')
     df = la.load_apache_logs_into_DataFrame('access_log')
+    data = la.group_by(df, 'referer')
+    data = la.count(data, 'referer')
+    print data
+    data = la.group_by(df, 'os')
+    data = la.count(data, 'os')
+    print data
+    data = la.group_by(df, 'request_country')
+    data = la.count(data, 'request_country')
+    print data
+    data = la.group_by(df, 'browser')
+    data = la.count(data, 'browser')
+    print data
     data = la.group_by(df, 'device')
-    print la.count(df, 'device')
-    # print la.median(data, 'request_size')
-    # print la.get_log_date_range('access_log')
+    data = la.count(data, 'device')
+    print data
+
+
+    # print la.to_json(data)
+    # # print la.median(data, 'request_size')
+    # # print la.get_log_date_range('access_log')
