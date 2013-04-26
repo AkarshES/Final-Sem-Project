@@ -14,8 +14,12 @@ function LogViewerCtrl($scope, $http, $routeParams, $filter){
     $scope.logset = $filter('filter')($scope.logsets, {name: $routeParams.table_name})[0];
 
     $scope.retrieve_logs = function(){
-        var from_datetime = $scope.from_date+" "+$scope.from_time;
-        var to_datetime = $scope.to_date+" "+$scope.to_time;
+        var from_datetime = moment($scope.from_date+" "+$scope.from_time, "DD/MM/YYYY hh:mm A").unix();
+        console.log($scope.from_date+" "+$scope.from_time);
+        console.log(moment($scope.from_date+" "+$scope.from_time, "DD/MM/YYYY hh:mm A"));
+        console.log(moment($scope.from_date+" "+$scope.from_time, "DD/MM/YYYY hh:mm A").isValid());
+        var to_datetime = moment($scope.to_date+" "+$scope.to_time, "DD/MM/YYYY hh:mm A").unix();
+        console.log(moment($scope.to_date+" "+$scope.to_time, "DD/MM/YYYY hh:mm A"));
         $http.get(
                 '/data/'+$scope.logset.name,
                 {
