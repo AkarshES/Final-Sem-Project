@@ -85,13 +85,15 @@ class LogAnalyzer:
         if collection_name not in self.db.collection_names():
             return False
         collection = self.db[collection_name]
-        log_data = collection.find({'date' : {"$gte": from_date, "$lt" : to_date}}).skip(page_number * 50).limit(50)
+        log_data = collection.find({'date' : {"$gte": from_date, "$lt" : to_date}})
+        page_count = log_data.count()
+        log_data = log_data.skip(page_number * 50).limit(50)
         log_list = []
         for log in log_data:
             log_list.append(log)
             log['date'] = log['date'].strftime("%s")
             log.pop('_id')
-        return json.dumps({"data" : log_list})
+        return json.dumps({"data" : log_list,"max_page" : page_count})
 
     def get_log_date_range(self, collection_name):
         if collection_name not in self.db.collection_names():
