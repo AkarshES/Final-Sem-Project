@@ -1,6 +1,6 @@
 <br />
 <div class="well span4 offset4">
-  <form action="/logsets" method=post enctype=multipart/form-data>
+  <form name="upload" action="/logsets" method=post enctype=multipart/form-data>
     <label for="name">Name of Table</label>
     <span ng-switch on="table_name">
       <input ng-switch-when="null" type="text" name="name" autofocus required />
