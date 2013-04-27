@@ -120,7 +120,7 @@ def upload_logset():
         new_logset.save()
         return jsonify(dict(status = 'Success', message = 'Upload successful'))
     else:
-        retun jsonify(dict(status = 'Error', message = 'No file provided'))
+        return jsonify(dict(status = 'Error', message = 'No file provided'))
 
 @login_required
 def get_logsets():
