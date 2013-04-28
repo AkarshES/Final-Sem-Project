@@ -65,7 +65,7 @@ class LogParser:
             ua_info_dict['referer'] = Referer(referer_url.group("url")).uri[1]
         return ua_info_dict
 
-class CollectionNotFound():
+class CollectionNotFound(Exception):
     pass
 
 class LogAnalyzer:    
@@ -81,17 +81,15 @@ class LogAnalyzer:
         log_data = self.collection.find()
         return DataFrame(list(log_data),columns = self.log_fields)
 
-    def get_log_data(self, collection_name, from_date = None, to_date = None, page_number = 0):
+    def get_log_data(self, from_date = None, to_date = None, page_number = 0):
+        page_size = 50
         if from_date is None:
             from_date = datetime(1970,1,1)
         if to_date is None:
             to_date = datetime.now()
-        if collection_name not in self.db.collection_names():
-            return False
-        collection = self.db[collection_name]
-        log_data = collection.find({'date' : {"$gte": from_date, "$lt" : to_date}})
-        page_count = log_data.count()
-        log_data = log_data.skip(page_number * 50).limit(50)
+        log_data = self.collection.find({'date' : {"$gte": from_date, "$lt" : to_date}})
+        page_count = log_data.count()/page_size
+        log_data = log_data.skip(page_number * page_size).limit(page_size)
         log_list = []
         for log in log_data:
             log_list.append(log)
@@ -145,3 +143,4 @@ class LogAnalyzer:
         for row in count_data.index:
             counts_list.append({"date" : datetime(row[0][0],row[0][1],row[0][2]).strftime("%s"), "status" : row[1], "count" : str(count_data[row])})
         return {"data" : counts_list}
+
