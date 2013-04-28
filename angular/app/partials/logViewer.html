@@ -38,14 +38,26 @@
         <input type="text" id="request_query" ng-model="log_row.request" />
     </form>
 </div>
+<pagination boundary-links="true" num-pages="noOfPages" current-page="currentPage" max-size="maxSize" on-select-page="retrieve_logs(page)"></pagination>
 <table class="table table-condensed table-striped logtable" cellspacing="0">
+    <thead>
+      <tr>
+        <td> Time </td>
+        <td> IP Address</td>
+        <td> Status </td>
+        <td> Request </td>
+      </tr>
+    </thead>
+    <tbody>
     <tr ng-repeat = "row in LogData | filter:log_row">
         <td style="width:11%;" class="date_column">{{row["date"] * 1000 | date:'medium' }}</td>
         <td style="width:8%;" class="ip_column">{{row["client_ip"]}}</td>
         <td style="width:3%;" class="status_column">{{row["status"]}}</td>
         <td style="width:40%;" class="request_column">{{row["request"]}}</td>
     </tr>
+  </tbody>
 </table>
+<pagination boundary-links="true" num-pages="noOfPages" current-page="currentPage" max-size="maxSize" on-select-page="retrieve_logs(page)"></pagination>
 <style type="text/css">
   input.ng-invalid.ng-dirty {
     background-color: #FA787E;

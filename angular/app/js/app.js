@@ -2,7 +2,7 @@
 
 
 // Declare app level module which depends on filters, and services
-var App = angular.module('App', ['ngResource', '$strap.directives']);
+var App = angular.module('App', ['ngResource', '$strap.directives', 'myApp.directives']);
 App.config(['$routeProvider', function($routeProvider) {
     $routeProvider
         .when('/',{
@@ -22,5 +22,5 @@ App.config(['$routeProvider', function($routeProvider) {
         })
         .otherwise({
             redirectTo:'/'
-        })
+        });
 }]);

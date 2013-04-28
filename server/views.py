@@ -9,6 +9,6 @@ app.add_url_rule('/changePassword', view_func=changePassword, methods=['GET', 'P
 app.add_url_rule('/', view_func=index)
 app.add_url_rule('/logsets', view_func=upload_logset, methods=['POST'])
 app.add_url_rule('/logsets', view_func=get_logsets, methods=['GET'])
-app.add_url_rule('/data/<string:collection_name>', view_func=log_data_retriever)
+app.add_url_rule('/data/<string:logset_name>', view_func=log_data_retriever)
 
 app.add_url_rule('/sample_data/<path:filename>', view_func=sample_data_returner)
