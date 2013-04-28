@@ -2,7 +2,7 @@ from flask import Response, request, render_template, redirect, url_for, flash, 
 from flask.ext.mongoengine import DoesNotExist, ValidationError
 from flask.ext.login import login_required, logout_user, login_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug import secure_filename, SharedDataMiddleware
+from werkzeug import secure_filename
 from server import app, db
 from User import User
 from Logsets_metadata import ApacheAccessLogsetMetadata, LogsetMetadata
@@ -85,21 +85,17 @@ def sample_data_returner(filename):
     return send_from_directory('./angular/sample_data', filename)
 
 @login_required
-def log_data_retriever(collection_name):
-    la = LogAnalyzer()
-    from_date = to_date = None
+def log_data_retriever(logset_name):
+    la = LogAnalyzer(collection = current_user.name + '_' + logset_name)
+    arguments = {}
     if request.args.get('from'):
-        from_date = datetime.fromtimestamp(int( request.args.get('from') ))
-    if request.args.get('from'):
-        to_date = datetime.fromtimestamp(int( request.args.get('to') ))
-    data = la.get_log_data(\
-            current_user.name + '_' + collection_name\
-            , from_date = from_date\
-            , to_date = to_date\
-            )
-    if data is False:
-        return jsonify(dict(status = 'Error', message='The collection does not exist'))
-    return data
+        arguments['from_date'] = datetime.fromtimestamp(int( request.args.get('from') ))
+    if request.args.get('to'):
+        arguments['to_date'] = datetime.fromtimestamp(int( request.args.get('to') ))
+    if request.args.get('page'):
+        arguments['page_number'] = int(request.args.get('page'))
+    data = la.get_log_data(**arguments)
+    return jsonify(data)
 
 @login_required
 def upload_logset():
@@ -125,11 +121,11 @@ def upload_logset():
 @login_required
 def get_logsets():
     names = []
-    la = LogAnalyzer()
     for logset in LogsetMetadata.objects(creator_name = current_user.name):
+        la = LogAnalyzer(collection = current_user.name + '_' + logset.name)
         names.append(dict(\
                 name = logset.name\
                 , fields = logset.fields\
-                , date_range = la.get_log_date_range(current_user.name + '_' + logset.name)\
+                , date_range = la.get_log_date_range()\
                 ))
     return jsonify(dict(data = names))
