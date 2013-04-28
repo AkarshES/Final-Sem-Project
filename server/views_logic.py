@@ -117,8 +117,10 @@ def upload_logset():
         collection_name = current_user.name + '_' + request.form['name']
         if lp.load_apache_log_file_into_DB(file_location, collection_name) is False:
             return jsonify(dict(status = 'Error', message='The data was not stored'))
-    new_logset.save()
-    return jsonify(dict(status = 'Success', message = 'Upload successful'))
+        new_logset.save()
+        return jsonify(dict(status = 'Success', message = 'Upload successful'))
+    else:
+        return jsonify(dict(status = 'Error', message = 'No file provided'))
 
 @login_required
 def get_logsets():
