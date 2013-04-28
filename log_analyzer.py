@@ -39,6 +39,8 @@ class LogParser:
                 log_data = dict(zip(fields,search[:1]+date+path+search[3:5]+search[8:]))
                 if(log_data['request_size'] == '-'):
                     log_data['request_size'] = 0
+                else:
+                    log_data['request_size'] = paserint(log_data['request_size'])
                 log_data.update(self.extract_user_agent_info(log_data['browser_string']))
                 request_country = self.geoip.country_name_by_addr(search[0])
                 log_data.update({'request_country' : request_country})
@@ -63,21 +65,23 @@ class LogParser:
             ua_info_dict['referer'] = Referer(referer_url.group("url")).uri[1]
         return ua_info_dict
 
+class CollectionNotFound():
+    pass
+
 class LogAnalyzer:    
-    def __init__(self, db = 'test'):
+    def __init__(self, db = 'test', collection = 'None'):
         self.client = MongoClient()
         self.db = self.client[db]
+        if collection not in self.db.collection_names():
+            raise CollectionNotFound("The given collection was not found in the DB.")
+        self.collection = self.db[collection]
+        self.log_fields = ['client_ip','date','request','status','request_size','browser_string','device' ,'os','browser','referer', 'request_country']
 
-    def load_apache_logs_into_DataFrame(self, collection_name):
-        fields = ['client_ip','date','request','status','request_size','browser_string','device' ,'os','browser','referer', 'request_country']
-        if collection_name not in self.db.collection_names():
-            return False
-        collection = self.db[collection_name]
-        log_data = collection.find()
-        return DataFrame(list(log_data),columns = fields)
+    def load_apache_logs_into_DataFrame(self):
+        log_data = self.collection.find()
+        return DataFrame(list(log_data),columns = self.log_fields)
 
     def get_log_data(self, collection_name, from_date = None, to_date = None, page_number = 0):
-        fields = ['client_ip','date','request','status','request_size','browser_string','device' ,'os','browser','referer', 'request_country']
         if from_date is None:
             from_date = datetime(1970,1,1)
         if to_date is None:
@@ -93,14 +97,11 @@ class LogAnalyzer:
             log_list.append(log)
             log['date'] = log['date'].strftime("%s")
             log.pop('_id')
-        return json.dumps({"data" : log_list,"max_page" : page_count})
+        return {"data" : log_list, "max_page" : page_count}
 
-    def get_log_date_range(self, collection_name):
-        if collection_name not in self.db.collection_names():
-            return False
-        collection = self.db[collection_name]
-        min = collection.find().sort([("date", 1)]).limit(1)
-        max = collection.find().sort([("date", -1)]).limit(1)
+    def get_log_date_range(self):
+        min = self.collection.find().sort([("date", 1)]).limit(1)
+        max = self.collection.find().sort([("date", -1)]).limit(1)
         return {"min_date" : min[0]['date'].strftime("%s"),"max_date" : max[0]['date'].strftime("%s")}
 
 
@@ -124,18 +125,16 @@ class LogAnalyzer:
     def group_by(self, df, field):
         return df.groupby(df[field])
     
-    def generate_stats(self, collection_name):
-        if collection_name not in self.db.collection_names():
-            return False
+    def generate_stats(self):
         stats_dict = {}
-        stats_dict['date_range'] = self.get_log_date_range(collection_name)
+        stats_dict['date_range'] = self.get_log_date_range()
 
-    def to_json(self, data):
+    def to_dict(self, data, field = 'key', operation = ''):
         data_list = []
         for row in data.index:
-            data_list.append({"key":row[1], "value":data[row]})
-            print {"key":row.encode("ascii","ignore"), "value":str(data[row])}
-        return json.dumps({"data" : data_list})
+            data_list.append({field : row, operation : data[row]})
+        return {"data" : data_list}
+
     def count_hits(self, collection_name):
         df = self.load_apache_logs_into_DataFrame(collection_name)
         if df is False:
@@ -145,4 +144,4 @@ class LogAnalyzer:
         counts_list = []
         for row in count_data.index:
             counts_list.append({"date" : datetime(row[0][0],row[0][1],row[0][2]).strftime("%s"), "status" : row[1], "count" : str(count_data[row])})
-        return json.dumps({"data" : counts_list})
+        return {"data" : counts_list}

@@ -5,15 +5,16 @@ if __name__ == '__main__':
     # lp.load_apache_log_file_into_DB('access_log_2','access_log')
     # lp.load_apache_log_file_into_DB('access_log_3','access_log')
     # lp.load_apache_log_file_into_DB('access_log_4','access_log')
-    la = LogAnalyzer()
-    print la.get_log_data(collection_name = 'access_log', page_number = 5)
+    la = LogAnalyzer(db = 'test', collection = 'access_log')
+    # print la.get_log_data(collection_name = 'access_log', page_number = 5)
     # print la.get_log_data('access_log')
     # print la.count_hits('access_log')
     
-    # df = la.load_apache_logs_into_DataFrame('access_log')
-    # data = la.group_by(df, 'referer')
-    # data = la.count(data, 'referer')
-    # print data
+    df = la.load_apache_logs_into_DataFrame()
+    data = la.group_by(df, 'referer')
+    data = la.count(data, 'referer')
+    print la.to_dict(data)
+    #print la.to_dict(data, 'referer', 'count')
     # data = la.group_by(df, 'os')
     # data = la.count(data, 'os')
     # print data
@@ -26,8 +27,3 @@ if __name__ == '__main__':
     # data = la.group_by(df, 'device')
     # data = la.count(data, 'device')
     # print data
-
-
-    # print la.to_json(data)
-    # print la.median(data, 'request_size')
-    # print la.get_log_date_range('access_log')
