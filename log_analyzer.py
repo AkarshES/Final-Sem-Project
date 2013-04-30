@@ -70,29 +70,32 @@ class CollectionNotFound(Exception):
     pass
 
 class LogAnalyzer:    
-    def __init__(self, db = 'test', collection = 'None'):
+    def __init__(self, db = 'test', collection = 'None', from_date = None, to_date = None):
         self.client = MongoClient()
         self.db = self.client[db]
+
         if collection not in self.db.collection_names():
             raise CollectionNotFound("The given collection was not found in the DB.")
         self.collection = self.db[collection]
+
+        if from_date is None:
+            from_date = datetime(1970,1,1)
+        if to_date is None:
+            to_date = datetime.now()
+        self.log_data = self.collection.find({'date' : {"$gte": from_date, "$lt" : to_date}})
+
         self.log_fields = ['client_ip','date','request','status','request_size','browser_string','device' ,'os','browser','referer', 'request_country']
 
     def load_apache_logs_into_DataFrame(self):
         log_data = self.collection.find()
         return DataFrame(list(log_data),columns = self.log_fields)
 
-    def get_log_data(self, from_date = None, to_date = None, page_number = 0):
+    def get_log_data(self, page_number = 0):
         page_size = 50
-        if from_date is None:
-            from_date = datetime(1970,1,1)
-        if to_date is None:
-            to_date = datetime.now()
-        log_data = self.collection.find({'date' : {"$gte": from_date, "$lt" : to_date}})
-        page_count = log_data.count()/page_size
-        log_data = log_data.skip(page_number * page_size).limit(page_size)
+        page_count = self.log_data.count()/page_size
+        paginated_log_data = self.log_data.skip(page_number * page_size).limit(page_size)
         log_list = []
-        for log in log_data:
+        for log in paginated_log_data:
             log_list.append(log)
             log['date'] = log['date'].strftime("%s")
             log.pop('_id')
