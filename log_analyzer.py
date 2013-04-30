@@ -128,10 +128,32 @@ class LogAnalyzer:
         stats_dict['date_range'] = self.get_log_date_range()
 
     def to_dict(self, data, field = 'key', operation = ''):
-        data_list = []
-        for row in data.index:
-            data_list.append({field : row, operation : data[row]})
-        return {"data" : data_list}
+        '''
+        Function to convert pandas datetypes to jsonable dicts
+        '''
+        class_name = data.__class__.__name__
+        if class_name == 'Series':
+            data_list = []
+            for row in data.index:
+                data_list.append({\
+                        field : row\
+                        , operation : asscalar( data[row] )\
+                        })
+            return {"data" : data_list}
+        elif class_name == 'DataFrame':
+            data_list = []
+            for row in data.values:
+                row_list = []
+                for i,colname in enumerate(data.columns):
+                    if row[i].__class__.__name__ == "datetime":
+                        data = row[i].strftime("%s")
+                    else:
+                        data = row[i]
+                    row_list.append((colname, data))
+                data_list.append(dict(row_list))
+            return {"data" : data_list}
+        else:
+            raise TypeError('Unexpected type '+ class_name +', could not be handled by this function')
 
     def count_hits(self, collection_name):
         df = self.load_apache_logs_into_DataFrame(collection_name)
