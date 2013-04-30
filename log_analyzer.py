@@ -9,6 +9,7 @@ from pymongo import MongoClient
 from pandas import DataFrame
 from referer_parser import Referer
 from ua_parser import user_agent_parser
+from numpy import asscalar
 import pygeoip
 class LogParser:
     def __init__(self, db = 'test'):
@@ -40,7 +41,7 @@ class LogParser:
                 if(log_data['request_size'] == '-'):
                     log_data['request_size'] = 0
                 else:
-                    log_data['request_size'] = paserint(log_data['request_size'])
+                    log_data['request_size'] = int(log_data['request_size'])
                 log_data.update(self.extract_user_agent_info(log_data['browser_string']))
                 request_country = self.geoip.country_name_by_addr(search[0])
                 log_data.update({'request_country' : request_country})
@@ -114,13 +115,12 @@ class LogAnalyzer:
             print 'Check if the field ' + mean_of + ' exists.'
         return computed_mean
 
-    def group_by_date(self, df):
-        return df.groupby([df['date'].map(lambda x: (x.year, x.month, x.day)),df['status']])
-
     def count(self, df, field):
         return df[field].count()
     
     def group_by(self, df, field):
+        if field == 'date':
+            return df.groupby([df['date'].map(lambda x: (x.year, x.month, x.day)),df['status']])
         return df.groupby(df[field])
     
     def generate_stats(self):
@@ -137,7 +137,7 @@ class LogAnalyzer:
         df = self.load_apache_logs_into_DataFrame(collection_name)
         if df is False:
             return False
-        df = self.group_by_date(df)
+        df = self.group_by(df, 'date')
         count_data = self.count(df, 'request_size')
         counts_list = []
         for row in count_data.index:
