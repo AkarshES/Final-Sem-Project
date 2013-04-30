@@ -9,6 +9,7 @@ from pymongo import MongoClient
 from pandas import DataFrame
 from referer_parser import Referer
 from ua_parser import user_agent_parser
+from numpy import asscalar
 import pygeoip
 class LogParser:
     def __init__(self, db = 'test'):
@@ -40,7 +41,7 @@ class LogParser:
                 if(log_data['request_size'] == '-'):
                     log_data['request_size'] = 0
                 else:
-                    log_data['request_size'] = paserint(log_data['request_size'])
+                    log_data['request_size'] = int(log_data['request_size'])
                 log_data.update(self.extract_user_agent_info(log_data['browser_string']))
                 request_country = self.geoip.country_name_by_addr(search[0])
                 log_data.update({'request_country' : request_country})
@@ -69,29 +70,32 @@ class CollectionNotFound(Exception):
     pass
 
 class LogAnalyzer:    
-    def __init__(self, db = 'test', collection = 'None'):
+    def __init__(self, db = 'test', collection = 'None', from_date = None, to_date = None):
         self.client = MongoClient()
         self.db = self.client[db]
+
         if collection not in self.db.collection_names():
             raise CollectionNotFound("The given collection was not found in the DB.")
         self.collection = self.db[collection]
+
+        if from_date is None:
+            from_date = datetime(1970,1,1)
+        if to_date is None:
+            to_date = datetime.now()
+        self.log_data = self.collection.find({'date' : {"$gte": from_date, "$lt" : to_date}})
+
         self.log_fields = ['client_ip','date','request','status','request_size','browser_string','device' ,'os','browser','referer', 'request_country']
 
     def load_apache_logs_into_DataFrame(self):
         log_data = self.collection.find()
         return DataFrame(list(log_data),columns = self.log_fields)
 
-    def get_log_data(self, from_date = None, to_date = None, page_number = 0):
+    def get_log_data(self, page_number = 0):
         page_size = 50
-        if from_date is None:
-            from_date = datetime(1970,1,1)
-        if to_date is None:
-            to_date = datetime.now()
-        log_data = self.collection.find({'date' : {"$gte": from_date, "$lt" : to_date}})
-        page_count = log_data.count()/page_size
-        log_data = log_data.skip(page_number * page_size).limit(page_size)
+        page_count = self.log_data.count()/page_size
+        paginated_log_data = self.log_data.skip(page_number * page_size).limit(page_size)
         log_list = []
-        for log in log_data:
+        for log in paginated_log_data:
             log_list.append(log)
             log['date'] = log['date'].strftime("%s")
             log.pop('_id')
@@ -114,13 +118,12 @@ class LogAnalyzer:
             print 'Check if the field ' + mean_of + ' exists.'
         return computed_mean
 
-    def group_by_date(self, df):
-        return df.groupby([df['date'].map(lambda x: (x.year, x.month, x.day)),df['status']])
-
     def count(self, df, field):
         return df[field].count()
     
     def group_by(self, df, field):
+        if field == 'date':
+            return df.groupby([df['date'].map(lambda x: (x.year, x.month, x.day)),df['status']])
         return df.groupby(df[field])
     
     def generate_stats(self):
@@ -128,16 +131,38 @@ class LogAnalyzer:
         stats_dict['date_range'] = self.get_log_date_range()
 
     def to_dict(self, data, field = 'key', operation = ''):
-        data_list = []
-        for row in data.index:
-            data_list.append({field : row, operation : data[row]})
-        return {"data" : data_list}
+        '''
+        Function to convert pandas datetypes to jsonable dicts
+        '''
+        class_name = data.__class__.__name__
+        if class_name == 'Series':
+            data_list = []
+            for row in data.index:
+                data_list.append({\
+                        field : row\
+                        , operation : asscalar( data[row] )\
+                        })
+            return {"data" : data_list}
+        elif class_name == 'DataFrame':
+            data_list = []
+            for row in data.values:
+                row_list = []
+                for i,colname in enumerate(data.columns):
+                    if row[i].__class__.__name__ == "datetime":
+                        data = row[i].strftime("%s")
+                    else:
+                        data = row[i]
+                    row_list.append((colname, data))
+                data_list.append(dict(row_list))
+            return {"data" : data_list}
+        else:
+            raise TypeError('Unexpected type '+ class_name +', could not be handled by this function')
 
     def count_hits(self, collection_name):
         df = self.load_apache_logs_into_DataFrame(collection_name)
         if df is False:
             return False
-        df = self.group_by_date(df)
+        df = self.group_by(df, 'date')
         count_data = self.count(df, 'request_size')
         counts_list = []
         for row in count_data.index:
