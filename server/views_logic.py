@@ -86,15 +86,21 @@ def sample_data_returner(filename):
 
 @login_required
 def log_data_retriever(logset_name):
-    la = LogAnalyzer(collection = current_user.name + '_' + logset_name)
+
     arguments = {}
+    arguments['collection'] = current_user.name + '_' + logset_name
     if request.args.get('from'):
         arguments['from_date'] = datetime.fromtimestamp(int( request.args.get('from') ))
     if request.args.get('to'):
         arguments['to_date'] = datetime.fromtimestamp(int( request.args.get('to') ))
+    la = LogAnalyzer(**arguments)
+
+    # old arguments not required, so reassigned
+    arguments = {}
     if request.args.get('page'):
         arguments['page_number'] = int(request.args.get('page'))
     data = la.get_log_data(**arguments)
+
     return jsonify(data)
 
 @login_required
