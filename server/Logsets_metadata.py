@@ -9,7 +9,12 @@ class LogsetMetadata(db.Document):
     fields = db.ListField(db.StringField())
     users_with_access = db.ListField(db.StringField(), required = True)
 
-    meta = { 'allow_inheritance': True }
+    meta = {
+        'allow_inheritance': True,
+        'indexes': [
+            {'fields': ('name', 'creator_name'), 'unique': True}
+        ]
+    }
 
 class ApacheAccessLogsetMetadata(LogsetMetadata):
     '''
