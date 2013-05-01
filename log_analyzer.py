@@ -130,7 +130,7 @@ class LogAnalyzer:
         stats_dict = {}
         stats_dict['date_range'] = self.get_log_date_range()
 
-    def to_dict(self, data, field = 'key', operation = ''):
+    def to_dict(self, data, key_label = 'label', value_label = 'value'):
         '''
         Function to convert pandas datetypes to jsonable dicts
         '''
@@ -139,13 +139,13 @@ class LogAnalyzer:
             data_list = []
             for row in data.index:
                 data_list.append({\
-                        field : row\
-                        , operation : asscalar( data[row] )\
+                        key_label : row\
+                        , value_label : asscalar( data[row] )\
                         })
             return {"data" : data_list}
         elif class_name == 'DataFrame':
             data_list = []
-            for row in data.values:
+            for row in data.value_labels:
                 row_list = []
                 for i,colname in enumerate(data.columns):
                     if row[i].__class__.__name__ == "datetime":
