@@ -1,45 +1,43 @@
-<h1>
-  Showing {{LogData.length}} logs for {{logset.name}} from {{min_date.format("DD/MM/YYYY")}} to {{max_date.format("DD/MM/YYYY")}}
-</h1>
 <div class="well well-small">
-    <form name="log_datetime_range" class="form-inline">
-        <label for="from_date">From</label>
-        <div class="control-group input-append">
-          <input type="text" class="input-small" id="from_date" ng-model="from_date" data-date-format="dd/mm/yyyy" bs-datepicker>
-          <button type="button" class="btn" data-toggle="datepicker"><i class="icon-calendar"></i></button>
-        </div>
-        <span ng-show="show_time">
-          <div class="control-group input-append">
-            <input type="text" class="input-mini" ng-model="from_time" value="12:00 AM" bs-timepicker>
-            <button type="button" class="btn" data-toggle="timepicker"><i class="icon-time"></i></button>
-          </div>
-        </span>
-        <label for="to_date">To</label>
-        <div class="control-group input-append">
-          <input type="text" class="input-small" id="to_date" ng-model="to_date" data-date-format="dd/mm/yyyy" bs-datepicker>
-          <button type="button" class="btn" data-toggle="datepicker"><i class="icon-calendar"></i></button>
-        </div>
-        <span ng-show="show_time">
-          <div class="control-group input-append">
-            <input type="text" class="input-mini" ng-model="to_time" value="12:00 AM" bs-timepicker>
-            <button type="button" class="btn" data-toggle="timepicker"><i class="icon-time"></i></button>
-          </div>
-        </span>
-        <button type="button" class="btn btn-success" ng-disabled="log_datetime_range.$invalid" ng-click="retrieve_logs()">Retrieve logs</button>
-        <button type="button" class="btn btn-info" ng-click = "show_time = !show_time">Use time</button>
-    </form>
-    <form class="form-inline">
-        <h4>Filter by:</h4>
-        <label for="client_ip_query">IP:</label>
-        <input type="text" class="input-medium" id="client_ip_query" ng-model="log_row.client_ip" />
-        <label for="status_query">Status:</label>
-        <input type="text" class="input-mini" id="status_query" ng-model="log_row.status" />
-        <label for="request_query">Request:</label>
-        <input type="text" id="request_query" ng-model="log_row.request" />
-    </form>
+  <h5>Viewing logs for the {{logset.name}} logset</h5>
+  <h5>First event was logged in this set at {{min_date.unix() * 1000 | date:'medium'}}</h5>
+  <h5>Last event was logged in this set at {{max_date.unix() * 1000 | date:'medium'}}</h5>
+  <form name="log_datetime_range" class="form-inline">
+    <h4>View logs:</h4>
+    <label for="from_date">From</label>
+    <div class="control-group input-append">
+      <input type="text" class="input-small" id="from_date" ng-model="from_date" data-date-format="dd/mm/yyyy" bs-datepicker>
+      <button type="button" class="btn" data-toggle="datepicker"><i class="icon-calendar"></i></button>
+    </div>
+    <div class="control-group input-append">
+      <input type="text" class="input-mini" ng-model="from_time" value="12:00 AM" bs-timepicker>
+      <button type="button" class="btn" data-toggle="timepicker"><i class="icon-time"></i></button>
+    </div>
+    <label for="to_date">To</label>
+    <div class="control-group input-append">
+      <input type="text" class="input-small" id="to_date" ng-model="to_date" data-date-format="dd/mm/yyyy" bs-datepicker>
+      <button type="button" class="btn" data-toggle="datepicker"><i class="icon-calendar"></i></button>
+    </div>
+    <div class="control-group input-append">
+      <input type="text" class="input-mini" ng-model="to_time" value="12:00 AM" bs-timepicker>
+      <button type="button" class="btn" data-toggle="timepicker"><i class="icon-time"></i></button>
+    </div>
+    <button type="button" class="btn btn-success" ng-disabled="log_datetime_range.$invalid" ng-click="retrieve_logs()">Retrieve logs</button>
+    <span ng-show="isInvalidDateRange || log_datetime_range.$invalid"><strong>Invalid date range</strong></span>
+  </form>
+  <form class="form-inline">
+    <h4>Filter by:</h4>
+    <label for="client_ip_query">IP:</label>
+    <input type="text" class="input-medium" id="client_ip_query" ng-model="log_row.client_ip" />
+    <label for="status_query">Status:</label>
+    <input type="text" class="input-mini" id="status_query" ng-model="log_row.status" />
+    <label for="request_query">Request:</label>
+    <input type="text" id="request_query" ng-model="log_row.request" />
+  </form>
 </div>
-<pagination boundary-links="true" num-pages="noOfPages" current-page="currentPage" max-size="maxSize" on-select-page="retrieve_logs(page)"></pagination>
-<table class="table table-condensed table-striped logtable" cellspacing="0">
+<span ng-show="LogData.length > 0">
+  <pagination boundary-links="true" num-pages="noOfPages" current-page="currentPage" max-size="maxSize" on-select-page="retrieve_logs(page)"></pagination>
+  <table class="table table-condensed table-striped logtable" cellspacing="0">
     <thead>
       <tr>
         <td> Time </td>
@@ -49,17 +47,16 @@
       </tr>
     </thead>
     <tbody>
-    <tr ng-repeat = "row in LogData | filter:log_row">
+      <tr ng-repeat = "row in LogData | filter:log_row">
         <td style="width:11%;" class="date_column">{{row["date"] * 1000 | date:'medium' }}</td>
         <td style="width:8%;" class="ip_column">{{row["client_ip"]}}</td>
         <td style="width:3%;" class="status_column">{{row["status"]}}</td>
         <td style="width:40%;" class="request_column">{{row["request"]}}</td>
-    </tr>
-  </tbody>
-</table>
-<pagination boundary-links="true" num-pages="noOfPages" current-page="currentPage" max-size="maxSize" on-select-page="retrieve_logs(page)"></pagination>
-<style type="text/css">
-  input.ng-invalid.ng-dirty {
-    background-color: #FA787E;
-  }
-</style>
+      </tr>
+    </tbody>
+  </table>
+  <pagination boundary-links="true" num-pages="noOfPages" current-page="currentPage" max-size="maxSize" on-select-page="retrieve_logs(page)"></pagination>
+</span>
+<p ng-show="LogData.length == 0" class="text-center"><div class="alert alert-info">
+  No Logs were found in the given range
+</div></p>
