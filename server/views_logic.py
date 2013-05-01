@@ -97,9 +97,22 @@ def log_data_retriever(logset_name):
 
     # old arguments not required, so reassigned
     arguments = {}
-    if request.args.get('page'):
-        arguments['page_number'] = int(request.args.get('page'))
-    data = la.get_log_data(**arguments)
+    operation = request.args.get('op', 'view')
+    if operation == 'count':
+        df = la.load_apache_logs_into_DataFrame()
+        # if field is absent bad request(400) is returned
+        field = request.args['field']
+        data = la.group_by(df, field)
+        data = la.count(data, field)
+        data = la.to_dict(data, key_label = field, value_label = operation)
+    elif operation == 'view':
+        if request.args.get('page'):
+            arguments['page_number'] = int(request.args.get('page'))
+        data = la.get_log_data(**arguments)
+    else:
+        app.logger.warning('Invalid operation ' + operation + ' requested')
+        #return a response indicating that the request could not be processed
+        return jsonify('Invalid operation received'), 422
 
     return jsonify(data)
 
