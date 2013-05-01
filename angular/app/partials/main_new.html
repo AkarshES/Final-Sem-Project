@@ -1,0 +1,72 @@
+<br />
+<br />
+<style type="text/css">
+ .container-narrow {
+        margin: 0 auto;
+        max-width: 700px;
+      }
+      
+.add-project{
+    float: right;
+}
+.project-listing{
+    border-bottom:solid;
+    border-color: #f1f1f1;
+    border-width: 1px;
+    padding: 20px;
+
+
+}
+
+.project-options{
+    float: right;
+    margin-top: -10px;
+}
+.project-name{
+    font-weight: bold;
+}
+</style>
+<div class="container-narrow">
+        <div class="page-header">
+             
+            <h2 class="muted">Projects</h2>
+               
+
+              
+        </div>
+        <div class="">
+                        <input type="text" ng-model="search" placeholder="Search Projects">
+                        <a class="btn btn-success add-project" data-toggle="modal" href="#/AddNewTable"><i class="icon-plus icon-white"></i> Add Project</a>
+        </div>
+        <div ng-repeat="logset in logsets | filter:search " class="">
+                
+                
+                <!-- <div ng-repeat="logset in logsets"> -->
+                <div class="project-listing">
+                    <span class="project-name"><a href="#/logviewer/{{logset.name}}">{{logset.name}}</a></span>
+                        <!-- <a href="#/AddNewTable/{{logset.name}}">Add logs</a> -->
+                        <div class="btn-group project-options">
+                          <a class="btn" href="#/logviewer/{{logset.name}}">View Logs</a>
+                          <button class="btn dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu">
+                            <li>
+                                <a href="">Dashboard</a>
+                            </li>
+                            <li>
+                                <a href="#/AddNewTable/{{logset.name}}">Add logs</a>
+                            </li>
+                            <li>
+                                <a href="">Delete</a>
+                            </li>
+                          </ul>
+                        </div>
+                </ul>
+                </div>
+            </div>
+           
+        </div>
+</div>
+
+

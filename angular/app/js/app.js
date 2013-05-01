@@ -6,7 +6,7 @@ var App = angular.module('App', ['ngResource', '$strap.directives', 'myApp.direc
 App.config(['$routeProvider', function($routeProvider) {
     $routeProvider
         .when('/',{
-            templateUrl:"static/partials/main.html"
+            templateUrl:"static/partials/main_new.html"
         })
         .when('/logviewer/:table_name',{
             templateUrl:"static/partials/logViewer.html",
