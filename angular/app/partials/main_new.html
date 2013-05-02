@@ -26,6 +26,9 @@
     font-weight: bold;
 }
 </style>
+<script type="text/javascript">
+$('a').tooltip();
+</script>
 <div class="container-narrow">
         <div class="page-header">
              
@@ -38,29 +41,22 @@
                         <input type="text" ng-model="search" placeholder="Search Projects">
                         <a class="btn btn-success add-project" data-toggle="modal" href="#/AddNewTable"><i class="icon-plus icon-white"></i> Add Project</a>
         </div>
+
         <div ng-repeat="logset in logsets | filter:search " class="">
                 
                 
-                <!-- <div ng-repeat="logset in logsets"> -->
+              
                 <div class="project-listing">
                     <span class="project-name"><a href="#/logviewer/{{logset.name}}">{{logset.name}}</a></span>
-                        <!-- <a href="#/AddNewTable/{{logset.name}}">Add logs</a> -->
-                        <div class="btn-group project-options">
-                          <a class="btn" href="#/logviewer/{{logset.name}}">View Logs</a>
-                          <button class="btn dropdown-toggle" data-toggle="dropdown">
-                            <span class="caret"></span>
-                          </button>
-                          <ul class="dropdown-menu">
-                            <li>
-                                <a href="">Dashboard</a>
-                            </li>
-                            <li>
-                                <a href="#/AddNewTable/{{logset.name}}">Add logs</a>
-                            </li>
-                            <li>
-                                <a href="">Delete</a>
-                            </li>
-                          </ul>
+                      
+
+                        <div class="project-options">
+                            
+                            <a href="#/logviewer/{{logset.name}}"  bs-tooltip="" title="Log Viewer"><i class="icon-list-alt"></i></a>
+                            <a href="#/AddNewTable/{{logset.name}}" bs-tooltip="" title="Add files"><i class="icon-plus"></i></a>
+                            <a href="" bs-tooltip="" title="Delete"><i class="icon-trash"></i></a>
+                           
+                        
                         </div>
                 </ul>
                 </div>
