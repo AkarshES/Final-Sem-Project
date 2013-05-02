@@ -1,4 +1,4 @@
-from flask import Response, request, render_template, redirect, url_for, flash, jsonify, send_from_directory, session
+from flask import request, render_template, redirect, url_for, flash, jsonify, send_from_directory
 from flask.ext.mongoengine import DoesNotExist, ValidationError
 from flask.ext.login import login_required, logout_user, login_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -97,9 +97,22 @@ def log_data_retriever(logset_name):
 
     # old arguments not required, so reassigned
     arguments = {}
-    if request.args.get('page'):
-        arguments['page_number'] = int(request.args.get('page'))
-    data = la.get_log_data(**arguments)
+    operation = request.args.get('op', 'view')
+    if operation == 'count':
+        df = la.load_apache_logs_into_DataFrame()
+        # if field is absent bad request(400) is returned
+        field = request.args['field']
+        data = la.group_by(df, field)
+        data = la.count(data, field)
+        data = la.to_dict(data, key_label = field, value_label = operation)
+    elif operation == 'view':
+        if request.args.get('page'):
+            arguments['page_number'] = int(request.args.get('page'))
+        data = la.get_log_data(**arguments)
+    else:
+        app.logger.warning('Invalid operation ' + operation + ' requested')
+        #return a response indicating that the request could not be processed
+        return jsonify('Invalid operation received'), 422
 
     return jsonify(data)
 
@@ -119,8 +132,11 @@ def upload_logset():
         collection_name = current_user.name + '_' + request.form['name']
         if lp.load_apache_log_file_into_DB(file_location, collection_name) is False:
             return jsonify(dict(status = 'Error', message='The data was not stored'))
-        new_logset.save()
-        return jsonify(dict(status = 'Success', message = 'Upload successful'))
+        try:
+            new_logset.save()
+            return jsonify(dict(status = 'Success', message = 'Upload successful'))
+        except db.NotUniqueError:
+            return jsonify(dict(status = 'Error', message = 'Logset by this name already exists'))
     else:
         return jsonify(dict(status = 'Error', message = 'No file provided'))
 
