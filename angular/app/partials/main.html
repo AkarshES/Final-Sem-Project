@@ -1,21 +1,68 @@
 <br />
 <br />
-<div class="offset3 span9">
-    <table id="main-table" class="table table-striped">
-        <tr>
-            <th>Table</th>
-            <th>Operations</th>
-        </tr>
-        <tr ng-repeat="logset in logsets">
-            <td>{{logset.name}}</td>
-            <td>
-                <a href="#/logviewer/{{logset.name}}">View logs</a>
-            </td>
-            <td>
-                <a href="#/AddNewTable/{{logset.name}}">Add logs</a>
-            </td>
-        </tr>
-    </table>
-    <a href="#/AddNewTable">Add New Project</a>
+<style type="text/css">
+ .container-narrow {
+        margin: 0 auto;
+        max-width: 700px;
+      }
+      
+.add-project{
+    float: right;
+}
+.project-listing{
+    border-bottom:solid;
+    border-color: #f1f1f1;
+    border-width: 1px;
+    padding: 20px;
+
+
+}
+
+.project-options{
+    float: right;
+    margin-top: -10px;
+}
+.project-name{
+    font-weight: bold;
+}
+</style>
+<script type="text/javascript">
+$('a').tooltip();
+</script>
+<div class="container-narrow">
+        <div class="page-header">
+             
+            <h2 class="muted">Projects</h2>
+               
+
+              
+        </div>
+        <div class="">
+                        <input type="text" ng-model="search" placeholder="Search Projects">
+                        <a class="btn btn-success add-project" data-toggle="modal" href="#/AddNewTable"><i class="icon-plus icon-white"></i> Add Project</a>
+        </div>
+
+        <div ng-repeat="logset in logsets | filter:search " class="">
+                
+                
+              
+                <div class="project-listing">
+                    <span class="project-name"><a href="#/logviewer/{{logset.name}}">{{logset.name}}</a></span>
+                      
+
+                        <div class="project-options">
+                            
+                            <a href="#/logviewer/{{logset.name}}"  bs-tooltip="" title="Log Viewer"><i class="icon-list-alt"></i></a>
+                            <a href="#/AddNewTable/{{logset.name}}" bs-tooltip="" title="Add files"><i class="icon-plus"></i></a>
+                            <a href="" bs-tooltip="" title="Delete"><i class="icon-trash"></i></a>
+                           
+                        
+                        </div>
+                </ul>
+                </div>
+            </div>
+           
+        </div>
 </div>
+
 
