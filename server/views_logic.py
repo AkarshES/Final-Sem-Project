@@ -151,3 +151,14 @@ def get_logsets():
                 , date_range = la.get_log_date_range()\
                 ))
     return jsonify(dict(data = names))
+
+@login_required
+def delete_logset(logset_name):
+    # remove logset from metadata
+    LogsetMetadata.objects.get(\
+        name = logset_name\
+        , creator_name = current_user.name\
+        ).delete()
+    la = LogAnalyzer(collection = current_user.name + '_' + logset_name)
+    la.collection.drop()
+    return jsonify(dict(status = 'Success', message = 'logset deleted'))
