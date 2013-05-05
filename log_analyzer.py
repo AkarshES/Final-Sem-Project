@@ -23,7 +23,7 @@ class LogParser:
         """
         Reads the log data from 'file_name' and loads it into 'collection_name' in MongoDB
         """
-        fields = ['client_ip','date','request','base_url','status','request_size','browser_string','device' ,'os','browser','referer', 'request_country']
+        fields = ['client_ip','date','request','status','request_size','browser_string']
         apache_log_regex = '([\da-zA-Z:\.\-]+) - - \[(.*?)\] "(.*?)" (\d+) ((\d+)|-) ("-")?(.*?) "(.*?)"'
         compiled_apache_log_regex = re.compile(apache_log_regex)
         log_file = open(file_name,"r")
@@ -52,7 +52,7 @@ class LogParser:
                     log_list = []
             except :
                 print line
-                #return False
+                return False
         if len(log_list) > 0:
             self.log_insert(collection_name,log_list)
         return True
