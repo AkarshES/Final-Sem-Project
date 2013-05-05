@@ -1,8 +1,5 @@
 #!/usr/bin/python
 import re
-import os
-import io
-import json
 import dateutil.parser
 from datetime import datetime
 from pymongo import MongoClient
@@ -10,6 +7,7 @@ from pandas import DataFrame
 from referer_parser import Referer
 from ua_parser import user_agent_parser
 from numpy import asscalar
+from urlparse import urlparse
 import pygeoip
 class LogParser:
     def __init__(self, db = 'test'):
@@ -25,7 +23,7 @@ class LogParser:
         """
         Reads the log data from 'file_name' and loads it into 'collection_name' in MongoDB
         """
-        fields = ['client_ip','date','request','status','request_size','browser_string','device' ,'os','browser','referer', 'request_country']
+        fields = ['client_ip','date','request','status','request_size','browser_string']
         apache_log_regex = '([\da-zA-Z:\.\-]+) - - \[(.*?)\] "(.*?)" (\d+) ((\d+)|-) ("-")?(.*?) "(.*?)"'
         compiled_apache_log_regex = re.compile(apache_log_regex)
         log_file = open(file_name,"r")
@@ -38,13 +36,14 @@ class LogParser:
                 date = (datetime(date.year,date.month,date.day,date.hour,date.minute,date.second),)
                 path = (search[2].split()[1],)
                 log_data = dict(zip(fields,search[:1]+date+path+search[3:5]+search[8:]))
+                log_data['base_url'] = urlparse(log_data['request']).geturl()
                 if(log_data['request_size'] == '-'):
                     log_data['request_size'] = 0
                 else:
                     log_data['request_size'] = int(log_data['request_size'])
                 log_data.update(self.extract_user_agent_info(log_data['browser_string']))
                 request_country = self.geoip.country_name_by_addr(search[0])
-                log_data.update({'request_country' : request_country})
+                log_data['request_country'] = request_country
                 count += 1
                 log_list.append(log_data)
                 if count == 400:
@@ -53,7 +52,7 @@ class LogParser:
                     log_list = []
             except :
                 print line
-                #return False
+                return False
         if len(log_list) > 0:
             self.log_insert(collection_name,log_list)
         return True
