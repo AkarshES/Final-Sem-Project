@@ -5,6 +5,7 @@ function MainCtrl($scope, $http){
     $http.get('/logsets').success(function(response_json, status){
         $scope.logsets = response_json.data;
     });
+
 }
 
 function LogViewerCtrl($scope, $http, $routeParams, $filter){
@@ -75,4 +76,33 @@ function LogViewerCtrl($scope, $http, $routeParams, $filter){
 function AddTableCtrl($scope, $http, $routeParams){
     //optionally set table_name
     $scope.table_name = $routeParams.table_name || null;
+}
+
+function GraphCtrl ($scope) {
+    
+    $scope.data="testing";
+    //alert('here')
+     var chart = new CanvasJS.Chart("chartContainer", {
+
+      title:{
+        text: "Fruits sold in First Quarter"              
+      },
+      data: [//array of dataSeries              
+        { //dataSeries object
+
+         /*** Change type "column" to "bar", "area", "line" or "pie"***/
+         type: "column",
+         dataPoints: [
+         { label: "banana", y: 18 },
+         { label: "orange", y: 29 },
+         { label: "apple", y: 40 },                                    
+         { label: "mango", y: 34 },
+         { label: "grapes", y: 24 }
+         ]
+       }
+       ]
+     });
+
+    chart.render();
+
 }

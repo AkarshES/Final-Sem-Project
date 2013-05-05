@@ -12,13 +12,17 @@ App.config(['$routeProvider', function($routeProvider) {
             templateUrl:"static/partials/logViewer.html",
             controller:"LogViewerCtrl"
         })
-        .when('/AddNewTable', {
+         .when('/AddNewTable', {
             templateUrl:'static/partials/fileUpload.html',
             controller:"AddTableCtrl"
         })
         .when('/AddNewTable/:table_name', {
             templateUrl:'static/partials/fileUpload.html',
             controller:"AddTableCtrl"
+        })
+        .when('/dashboard',{
+            templateUrl:"static/partials/dashboard.html",
+            controller:"GraphCtrl"
         })
         .otherwise({
             redirectTo:'/'
