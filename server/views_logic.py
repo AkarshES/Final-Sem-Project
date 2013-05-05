@@ -132,11 +132,12 @@ def upload_logset():
         collection_name = current_user.name + '_' + request.form['name']
         if lp.load_apache_log_file_into_DB(file_location, collection_name) is False:
             return jsonify(dict(status = 'Error', message='The data was not stored'))
-        try:
-            new_logset.save()
-            return jsonify(dict(status = 'Success', message = 'Upload successful'))
-        except db.NotUniqueError:
-            return jsonify(dict(status = 'Error', message = 'Logset by this name already exists'))
+        else:
+            try:
+                new_logset.save()
+                return jsonify(dict(status = 'Success', message = 'Upload successful'))
+            except db.NotUniqueError:
+                return jsonify(dict(status = 'Error', message = 'Logset by this name already exists'))
     else:
         return jsonify(dict(status = 'Error', message = 'No file provided'))
 
