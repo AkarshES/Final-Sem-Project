@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug import secure_filename
 from server import app, db
 from User import User
-from Logsets_metadata import ApacheAccessLogsetMetadata, LogsetMetadata
+from Logsets_metadata import LogsetMetadata
 from log_analyzer import LogAnalyzer, LogParser
 import os
 from datetime import datetime
@@ -118,7 +118,8 @@ def log_data_retriever(logset_name):
 
 @login_required
 def upload_logset():
-    new_logset = ApacheAccessLogsetMetadata(\
+    #created specifies if the new_logset is a pre-existing object or new
+    new_logset, created = LogsetMetadata.objects.get_or_create(\
                 name = request.form['name']\
                 , creator_name = current_user.name\
                 , users_with_access = [current_user.name]\
