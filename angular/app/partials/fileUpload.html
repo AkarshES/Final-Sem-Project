@@ -4,7 +4,7 @@
     <label for="name">Name of Table</label>
     <span ng-switch on="table_name">
       <input ng-switch-when="null" type="text" name="name" autofocus required />
-      <input ng-switch-default type="text" name="name" autofocus required disabled value="{{table_name}}" />
+      <input ng-switch-default type="text" name="name" required readonly value="{{table_name}}" />
     </span>
     <label for="file">File Location</label>
     <input type="file" name="file" required>
