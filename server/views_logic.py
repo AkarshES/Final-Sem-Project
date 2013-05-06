@@ -150,6 +150,7 @@ def get_logsets():
         names.append(dict(\
                 name = logset.name\
                 , fields = logset.fields\
+                , total_entries = la.log_data.count()\
                 , date_range = la.get_log_date_range()\
                 ))
     return jsonify(dict(data = names))
