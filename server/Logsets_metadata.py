@@ -20,4 +20,6 @@ class ApacheAccessLogsetMetadata(LogsetMetadata):
     '''
     A class that represents the metadata for an apache access logset
     '''
-    fields = db.ListField(db.StringField(), default = ['client_ip','date','request','status','request_size','browser_string'])
+    fields = db.ListField(db.StringField()\
+        , default = ["status", "client_ip", "browser", "browser_string", "request", "request_size", "base_url", "date", "referer", "device", "os", "request_country"]\
+        )
