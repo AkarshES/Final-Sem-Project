@@ -11,8 +11,8 @@ if __name__ == '__main__':
     # print la.count_hits('access_log')
     
     df = la.load_apache_logs_into_DataFrame()
-    # data = la.group_by(df,['status'])
-    print la.median(df,'request_size', ['status','referer'])
+    data = la.group_by(df,['os', 'browser'])
+    print la.count(data, ['referer'])['referer'] #group_by os and browser and return the count of referer based on that groups. notice the field selection after the count, otherwise all the fields will be printed
     # print la.count(data, 'referer')
     # data = la.group_by(df, 'referer')
     # data = la.count(data, 'referer')
