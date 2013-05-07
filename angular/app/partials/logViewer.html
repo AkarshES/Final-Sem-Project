@@ -1,9 +1,52 @@
+<div class="container">
+
+<div class="masthead">
+        <ul class="nav nav-pills pull-right">
+          <li><a href="#">Dashboard</a></li>
+          <li class="active"><a href="#">Log Viewer</a></li>
+          
+        </ul>
+        <h4 class="muted">{{logset.name}}</h4>
+</div>
+<!-- 
 <div class="well well-small">
   <h5>Viewing logs for the {{logset.name}} logset</h5>
   <h5>First event was logged in this set at {{min_date.unix() * 1000 | date:'medium'}}</h5>
-  <h5>Last event was logged in this set at {{max_date.unix() * 1000 | date:'medium'}}</h5>
-  <form name="log_datetime_range" class="form-inline">
-    <h4>View logs:</h4>
+  <h5>Last event was logged in this set at {{max_date.unix() * 1000 | date:'medium'}}</h5>!
+-->
+  
+ <!--
+  <form class="form-inline">
+    <h4>Filter by:</h4>
+    <label for="client_ip_query">IP:</label>
+    <input type="text" class="input-medium" id="client_ip_query" ng-model="log_row.client_ip" />
+    <label for="status_query">Status:</label>
+    <input type="text" class="input-mini" id="status_query" ng-model="log_row.status" />
+    <label for="request_query">Request:</label>
+    <input type="text" id="request_query" ng-model="log_row.request" />
+  </form>
+</div>
+ -->
+ <br>
+ <div class="well">
+<div class="input-append">
+  <input class="span9" ng-model="log_row.$" id="appendedDropdownButton" type="text" placeholder="Filter log file">
+  <!-- 
+  <div class="btn-group">
+    <button class="btn dropdown-toggle" data-toggle="dropdown">
+      Action
+      <span class="caret"></span>
+    </button>
+
+    <ul class="dropdown-menu">
+      <li><a href="#">Action</a></li>
+    </ul>
+
+  </div> -->
+
+</div>
+<form name="log_datetime_range" class="form-inline">
+    
     <label for="from_date">From</label>
     <div class="control-group input-append">
       <input type="text" class="input-small" id="from_date" ng-model="from_date" data-date-format="dd/mm/yyyy" bs-datepicker>
@@ -25,16 +68,7 @@
     <button type="button" class="btn btn-success" ng-disabled="log_datetime_range.$invalid" ng-click="retrieve_logs()">Retrieve logs</button>
     <span ng-show="isInvalidDateRange || log_datetime_range.$invalid"><strong>Invalid date range</strong></span>
   </form>
-  <form class="form-inline">
-    <h4>Filter by:</h4>
-    <label for="client_ip_query">IP:</label>
-    <input type="text" class="input-medium" id="client_ip_query" ng-model="log_row.client_ip" />
-    <label for="status_query">Status:</label>
-    <input type="text" class="input-mini" id="status_query" ng-model="log_row.status" />
-    <label for="request_query">Request:</label>
-    <input type="text" id="request_query" ng-model="log_row.request" />
-  </form>
-</div>
+ </div>
 <span ng-show="LogData.length > 0">
   <pagination boundary-links="true" num-pages="noOfPages" current-page="currentPage" max-size="maxSize" on-select-page="retrieve_logs(page)"></pagination>
   <table class="table table-condensed table-striped logtable" cellspacing="0">
@@ -60,3 +94,5 @@
 <span ng-show="LogData.length == 0" class="text-center"><div class="alert alert-info">
   No Logs were found in the given range
 </div></span>
+
+</div>
