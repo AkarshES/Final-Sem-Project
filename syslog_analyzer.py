@@ -2,6 +2,7 @@ import re
 import calendar
 from pymongo import MongoClient
 from datetime import datetime
+from log_analyzer import LogAnalyzer
 
 class SysLogFileProcessor:
 	"""This class reads a syslog file and stores the log information into a database"""
@@ -37,3 +38,8 @@ class SysLogFileProcessor:
 				count += 1
 			except: 
 				print line
+
+class SysLogAnalyzer(LogAnalyzer):
+	def __init__(self, db = 'test', collection = 'None', from_date = None, to_date = None):
+		LogAnalyzer.__init__(self, db, collection, from_date, to_date)
+		self.log_fields = ['date', 'service', 'time_since_bootup', 'message']
