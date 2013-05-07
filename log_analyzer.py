@@ -63,6 +63,8 @@ class LogParser:
         ua_info_dict = {'device' : result_dict['device']['family'],'os' : result_dict['os']['family'], 'browser' : result_dict['user_agent']['family']}
         if referer_url is not None:
             ua_info_dict['referer'] = Referer(referer_url.group("url")).uri[1]
+        else:
+            ua_info_dict['referer'] = 'None'
         return ua_info_dict
 
 class CollectionNotFound(Exception):
@@ -87,7 +89,7 @@ class LogAnalyzer:
 
     def load_apache_logs_into_DataFrame(self):
         log_data = self.collection.find()
-        return DataFrame(list(log_data),columns = self.log_fields)
+        return DataFrame(list(log_data),columns = self.log_fields, dtype=float)
 
     def get_log_data(self, page_number = 0):
         page_size = 50
@@ -110,7 +112,7 @@ class LogAnalyzer:
         computed_mean = None
         try:
             if(group_by):
-                computed_mean = df[mean_of].groupby(df[group_by]).median()
+                computed_mean = df.groupby(group_by)[mean_of].median()
             else:   
                 computed_mean = df[mean_of].median()
         except KeyError:
@@ -123,7 +125,7 @@ class LogAnalyzer:
     def group_by(self, df, field):
         if field == 'date':
             return df.groupby([df['date'].map(lambda x: (x.year, x.month, x.day)),df['status']])
-        return df.groupby(df[field])
+        return df.groupby(field)
     
     def generate_stats(self):
         stats_dict = {}

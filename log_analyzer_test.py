@@ -11,10 +11,13 @@ if __name__ == '__main__':
     # print la.count_hits('access_log')
     
     df = la.load_apache_logs_into_DataFrame()
-    data = la.group_by(df, 'referer')
-    data = la.count(data, 'referer')
-    print la.to_dict(data)
-    #print la.to_dict(data, 'referer', 'count')
+    # data = la.group_by(df,['status'])
+    print la.median(df,'request_size', ['status','referer'])
+    # print la.count(data, 'referer')
+    # data = la.group_by(df, 'referer')
+    # data = la.count(data, 'referer')
+    # print la.to_dict(data)
+    # #print la.to_dict(data, 'referer', 'count')
     # data = la.group_by(df, 'os')
     # data = la.count(data, 'os')
     # print data
