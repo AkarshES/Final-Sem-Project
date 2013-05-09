@@ -76,6 +76,8 @@ class LogAnalyzer:
     def __init__(self, db = 'test', collection = 'None', from_date = None, to_date = None):
         self.client = MongoClient()
         self.db = self.client[db]
+        self.from_date = from_date
+        self.to_date = to_date
 
         if collection not in self.db.collection_names():
             raise CollectionNotFound("The given collection was not found in the DB.")
