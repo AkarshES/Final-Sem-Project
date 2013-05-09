@@ -109,6 +109,8 @@ def log_data_retriever(logset_name):
         if request.args.get('page'):
             arguments['page_number'] = int(request.args.get('page'))
         data = la.get_log_data(**arguments)
+    elif operation == 'hourly_bandwidth':
+        data = la.hourly_bandwidth()
     else:
         app.logger.warning('Invalid operation ' + operation + ' requested')
         #return a response indicating that the request could not be processed
@@ -119,6 +121,8 @@ def log_data_retriever(logset_name):
 @login_required
 def upload_logset():
     #created specifies if the new_logset is a pre-existing object or new
+    if request.form['name'] == "":
+        return jsonify(dict(status = 'Error', message = "Provide a name for the logset"))
     new_logset, created = LogsetMetadata.objects.get_or_create(\
                 name = request.form['name']\
                 , creator_name = current_user.name\
