@@ -1,6 +1,9 @@
+<div class="alerts">
+  <div class="alert fade" ng-repeat="alert in alerts" bs-alert="alert"></div>
+</div>
 <br />
 <div class="well span4 offset4">
-  <form name="upload" action="/logsets" method=post enctype=multipart/form-data>
+  <form name="upload" action="/logsets" ng-upload>
     <label for="name">Name of Table</label>
     <span ng-switch on="table_name">
       <input ng-switch-when="null" type="text" name="name" autofocus required />
@@ -10,6 +13,6 @@
     <input type="file" name="file" required>
     <br />
     <br />
-    <input class="btn btn&#45;large btn&#45;success" ng-disable="upload.$invalid" type="submit" value="Upload">
+    <input class="btn btn&#45;large btn&#45;success" upload-submit="handleResponse(content, completed)" ng-disable="upload.$invalid" type="submit" value="Upload">
   </form>
 </div>

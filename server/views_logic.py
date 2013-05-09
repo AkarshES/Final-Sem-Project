@@ -119,6 +119,8 @@ def log_data_retriever(logset_name):
 @login_required
 def upload_logset():
     #created specifies if the new_logset is a pre-existing object or new
+    if request.form['name'] == "":
+        return jsonify(dict(status = 'Error', message = "Provide a name for the logset"))
     new_logset, created = LogsetMetadata.objects.get_or_create(\
                 name = request.form['name']\
                 , creator_name = current_user.name\
