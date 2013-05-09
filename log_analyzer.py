@@ -52,7 +52,9 @@ class LogParser:
                     log_list = []
             except :
                 print line
-                return False
+
+        if collection_name not in self.db.collection_names():
+            return False
         if len(log_list) > 0:
             self.log_insert(collection_name,log_list)
         return True
@@ -160,6 +162,7 @@ class LogAnalyzer:
             raise TypeError('Unexpected type '+ class_name +', could not be handled by this function')
 
     def count_hits(self, collection_name):
+        """Not needed anymore, just a function to do all the processing in one go for results"""
         df = self.load_apache_logs_into_DataFrame(collection_name)
         if df is False:
             return False
