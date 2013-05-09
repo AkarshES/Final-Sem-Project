@@ -109,6 +109,8 @@ def log_data_retriever(logset_name):
         if request.args.get('page'):
             arguments['page_number'] = int(request.args.get('page'))
         data = la.get_log_data(**arguments)
+    elif operation == 'hourly_bandwidth':
+        data = la.hourly_bandwidth()
     else:
         app.logger.warning('Invalid operation ' + operation + ' requested')
         #return a response indicating that the request could not be processed
