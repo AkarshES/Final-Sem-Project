@@ -107,6 +107,23 @@ function LogViewerCtrl($scope, $http, $routeParams, $filter){
 function AddTableCtrl($scope, $http, $routeParams){
     //optionally set table_name
     $scope.table_name = $routeParams.table_name || null;
+
+    $scope.handleResponse = function(content, completed){
+        if(completed && content.length > 0){
+            $scope.response = angular.fromJson(content);
+            if($scope.response.status == 'Success'){
+                window.location.href = '/';
+            } else {
+                //incase upload fails
+                console.log("here");
+                $scope.alerts.insert({
+                    type: "error"
+                    , title: $scope.response.message || "Unexpected error occured, contact a system admin"
+                });
+                console.log("here");
+            }
+        }
+    };
 }
 
 function GraphCtrl ($scope) {
