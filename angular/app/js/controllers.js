@@ -15,6 +15,37 @@ function LogViewerCtrl($scope, $http, $routeParams, $filter){
     //complicated way to get the correct logset object from the logsets array
     $scope.logset = $filter('filter')($scope.logsets, {name: $routeParams.table_name})[0];
 
+    $scope.$watch('log_row_filter', function(newValue, oldValue){
+        var conditions = newValue.split(/\s*[\s,;]\s*/);//split on any of the following: space , ; with optional surrounding spaces
+        if(conditions[conditions.length - 1] == ""){
+            conditions.pop();
+        }
+        var valid_fields = $scope.logset.fields;
+        $scope.log_row = {};
+        angular.forEach(conditions, function (condition, index){
+            var key, value, pair;
+            pair = condition.split(/\s*[:=]\s*/);//split on : or = into key value pair
+            key = pair[0].toLowerCase() || "";
+            value = pair[1] || "";
+            if(key == ""){
+                return;
+            }
+            var i, key_regex = new RegExp('^'+key), isValid = false;
+            for(i=0;i<valid_fields.length;i++){
+                if(key_regex.test(valid_fields[i])){
+                    key = valid_fields[i];
+                    isValid = true;
+                }
+            }
+            if(!isValid){
+                console.log('here')
+                return;
+            }
+            console.log(key+':'+value);
+            $scope.log_row[key] = value;
+        });
+    });
+
     $scope.retrieve_logs = function(page_number){
         //correctly set from_datetime
         var from_datetime = moment($scope.from_time, "hh:mm A");
