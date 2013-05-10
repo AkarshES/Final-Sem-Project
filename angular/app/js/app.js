@@ -20,7 +20,7 @@ App.config(['$routeProvider', function($routeProvider) {
             templateUrl:'static/partials/fileUpload.html',
             controller:"AddTableCtrl"
         })
-        .when('/dashboard',{
+        .when('/dashboard/:table_name',{
             templateUrl:"static/partials/dashboard.html",
             controller:"GraphCtrl"
         })

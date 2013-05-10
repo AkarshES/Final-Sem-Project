@@ -1,37 +1,70 @@
-
-
-
-<script type="text/javascript">
-  // function test() {
-  //   var chart = new CanvasJS.Chart("chartContainer", {
-
-  //     title:{
-  //       text: "Fruits sold in First Quarter"              
-  //     },
-  //     data: [//array of dataSeries              
-  //       { //dataSeries object
-
-  //        /*** Change type "column" to "bar", "area", "line" or "pie"***/
-  //        type: "column",
-  //        dataPoints: [
-  //        { label: "banana", y: 18 },
-  //        { label: "orange", y: 29 },
-  //        { label: "apple", y: 40 },                                    
-  //        { label: "mango", y: 34 },
-  //        { label: "grape", y: 24 }
-  //        ]
-  //      }
-  //      ]
-  //    });
-
-  //   chart.render();
-
-  // }
-  </script>
+<style type="text/css">
+  .dashboard{
+  padding-top: 30px;
+}
+.summary{
+  position: relative;
+  left: 30px;
+}
+</style>
   
-</head> 
-<input type="button" value="Click" onclick="test()">
-  <div id="chartContainer" style="height: 300px; width: 100%;">
-  </div>
+<div class="container">
+  <div class="masthead">
+        <ul class="nav nav-pills pull-right">
+          <li class="active"><a href="#">Dashboard</a></li>
+          <li><a href="#/logviewer/{{logset.name}}">Log Viewer</a></li>
+          
+        </ul>
+        <h4 class="muted">{{logset.name}}</h4>
+</div>
+<br>
+<!-- <div class="summary">
+<table class="table table-striped">
+              <thead>
+                <tr>
+                 
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Username</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                 
+                  <td>Mark</td>
+                  <td>Otto</td>
+                  <td>@mdo</td>
+                </tr>
+               
+              </tbody>
+            </table>
+</div> -->
+ <div class="row">
+    
+    <div id="chartContainer" class="span6" style="height: 600px; width: 100%;"> </div>
+    <div id="chartContainer2" class="span6"style="height: 900px; width: 100%;"> </div>
+    <div id="chartContainer3" class="span6"style="height: 600px; width: 100%;"> </div>
 
-{{data}}
+
+</div> 
+<div class="dashboard">
+<!-- <div class="packery js-packery" data-packery-options='{"gutter": 10,,"itemSelector": ".item", "columnWidth": ".grid-sizer" }'>
+    <div class="item">357</div>
+    <div class="gutter-sizer"></div>
+    <div class="grid-sizer"></div>
+    <div class="item"></div>
+    <div class="gutter-sizer"></div>
+    <div class="item"></div>
+   <!--  <div class="item w2"></div>
+    <div class="item"></div>
+    <div class="item"></div><div class="item"></div>
+    <div class="item w2 h2"></div>
+    <div class="item"></div>
+    <div class="item w2"></div>
+    <div class="item"></div>
+    <div class="item h2"></div> 
+    
+  </div> -->
+  
+  </div>
+</div>
