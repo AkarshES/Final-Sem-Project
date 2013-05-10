@@ -1,4 +1,5 @@
 from log_analyzer import LogAnalyzer
+from json import json
 if __name__ == '__main__':
     # lp = LogParser()
     # lp.load_apache_log_file_into_DB('access_log_1','access_log')
@@ -11,10 +12,15 @@ if __name__ == '__main__':
     # print la.count_hits('access_log')
     
     df = la.load_apache_logs_into_DataFrame()
-    data = la.group_by(df, 'referer')
-    data = la.count(data, 'referer')
-    print la.to_dict(data)
-    #print la.to_dict(data, 'referer', 'count')
+    data = la.group_by(df,['request_country'])
+    print json.dumps(la.daily_bandwidth_sums())
+    # print la.sum(data, 'request_size')
+    # print (la.count(data, ['request_country'])['request_country']) #group_by os and browser and return the count of referer based on that groups. notice the field selection after the count, otherwise all the fields will be printed
+    # print la.count(data, 'referer')
+    # data = la.group_by(df, 'referer')
+    # data = la.count(data, 'referer')
+    # print la.to_dict(data)
+    # #print la.to_dict(data, 'referer', 'count')
     # data = la.group_by(df, 'os')
     # data = la.count(data, 'os')
     # print data

@@ -2,7 +2,7 @@
 
 
 // Declare app level module which depends on filters, and services
-var App = angular.module('App', ['ngResource', '$strap.directives', 'myApp.directives']);
+var App = angular.module('App', ['$strap.directives', 'myApp.directives', 'ngUpload']);
 App.config(['$routeProvider', function($routeProvider) {
     $routeProvider
         .when('/',{

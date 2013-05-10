@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import re
 import dateutil.parser
-from datetime import datetime
+from datetime import datetime, timedelta
 from pymongo import MongoClient
 from pandas import DataFrame
 from referer_parser import Referer
@@ -52,7 +52,9 @@ class LogParser:
                     log_list = []
             except :
                 print line
-                return False
+
+        if collection_name not in self.db.collection_names():
+            return False
         if len(log_list) > 0:
             self.log_insert(collection_name,log_list)
         return True
@@ -63,6 +65,8 @@ class LogParser:
         ua_info_dict = {'device' : result_dict['device']['family'],'os' : result_dict['os']['family'], 'browser' : result_dict['user_agent']['family']}
         if referer_url is not None:
             ua_info_dict['referer'] = Referer(referer_url.group("url")).uri[1]
+        else:
+            ua_info_dict['referer'] = 'None'
         return ua_info_dict
 
 class CollectionNotFound(Exception):
@@ -72,22 +76,24 @@ class LogAnalyzer:
     def __init__(self, db = 'test', collection = 'None', from_date = None, to_date = None):
         self.client = MongoClient()
         self.db = self.client[db]
+        self.from_date = from_date
+        self.to_date = to_date
 
         if collection not in self.db.collection_names():
             raise CollectionNotFound("The given collection was not found in the DB.")
         self.collection = self.db[collection]
 
         if from_date is None:
-            from_date = datetime(1970,1,1)
+            self.from_date = datetime(1970,1,1)
         if to_date is None:
-            to_date = datetime.now()
-        self.log_data = self.collection.find({'date' : {"$gte": from_date, "$lt" : to_date}})
+            self.to_date = datetime.now()
+        self.log_data = self.collection.find({'date' : {"$gte": self.from_date, "$lt" : self.to_date}})
 
         self.log_fields = ['client_ip','date','request','status','request_size','browser_string','device' ,'os','browser','referer', 'request_country']
 
     def load_apache_logs_into_DataFrame(self):
-        log_data = self.collection.find()
-        return DataFrame(list(log_data),columns = self.log_fields)
+        # log_data = self.collection.find()
+        return DataFrame(list(self.log_data),columns = self.log_fields, dtype=float)
 
     def get_log_data(self, page_number = 0):
         page_size = 50
@@ -110,7 +116,7 @@ class LogAnalyzer:
         computed_mean = None
         try:
             if(group_by):
-                computed_mean = df[mean_of].groupby(df[group_by]).median()
+                computed_mean = df.groupby(group_by)[mean_of].median()
             else:   
                 computed_mean = df[mean_of].median()
         except KeyError:
@@ -123,7 +129,10 @@ class LogAnalyzer:
     def group_by(self, df, field):
         if field == 'date':
             return df.groupby([df['date'].map(lambda x: (x.year, x.month, x.day)),df['status']])
-        return df.groupby(df[field])
+        return df.groupby(field)
+    
+    def sum(self, df, field):
+        return df[field].sum()
     
     def generate_stats(self):
         stats_dict = {}
@@ -157,7 +166,19 @@ class LogAnalyzer:
         else:
             raise TypeError('Unexpected type '+ class_name +', could not be handled by this function')
 
+    def daily_bandwidth_sums(self):
+        min_date = self.collection.find().sort([("date", 1)]).limit(1)[0]['date']
+        max_date = self.collection.find().sort([("date", -1)]).limit(1)[0]['date']
+        current = min_date
+        date_data = []
+        while current < max_date:
+            self.log_data = self.collection.find({'date' : {"$gte": current, "$lt" : current + timedelta(1)}})
+            data = self.load_apache_logs_into_DataFrame()
+            date_data.append({'date' : current.strftime("%s"), 'bandwidth' : self.sum(data, 'request_size')})
+            current = current + timedelta(1)
+        return {'data' : date_data}
     def count_hits(self, collection_name):
+        """Not needed anymore, just a function to do all the processing in one go for results"""
         df = self.load_apache_logs_into_DataFrame(collection_name)
         if df is False:
             return False
