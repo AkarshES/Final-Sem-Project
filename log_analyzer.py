@@ -24,17 +24,20 @@ class LogParser:
         Reads the log data from 'file_name' and loads it into 'collection_name' in MongoDB
         """
         fields = ['client_ip','date','request','status','request_size','browser_string']
-        apache_log_regex = '([\da-zA-Z:\.\-]+) - - \[(.*?)\] "(.*?)" (\d+) ((\d+)|-) ("-")?(.*?) "(.*?)"'
+        apache_log_regex = '([\da-zA-Z:\.\-]+) - [^ ]+ \[(.*?)\] "(.*?)" (\d+) ((\d+)|-) ("-")?(.*?) "(.*?)"'
         compiled_apache_log_regex = re.compile(apache_log_regex)
         log_file = open(file_name,"r")
         count = 0
         log_list = []
         for line in log_file.readlines():
-            try:
+            # try:
                 search = compiled_apache_log_regex.match(line).groups()
                 date = dateutil.parser.parse(search[1].replace(':', ' ', 1))
                 date = (datetime(date.year,date.month,date.day,date.hour,date.minute,date.second),)
-                path = (search[2].split()[1],)
+                if len(search[2].split()) > 1:
+                    path = (search[2].split()[1],)
+                else:
+                    path = ('-',)
                 log_data = dict(zip(fields,search[:1]+date+path+search[3:5]+search[8:]))
                 log_data['base_url'] = urlparse(log_data['request']).geturl()
                 if(log_data['request_size'] == '-'):
@@ -50,8 +53,8 @@ class LogParser:
                     count = 0
                     self.log_insert(collection_name,log_list)
                     log_list = []
-            except :
-                print line
+            # except :
+                # print line
 
         if collection_name not in self.db.collection_names():
             return False
@@ -62,7 +65,7 @@ class LogParser:
     def extract_user_agent_info(self, ua_string):
         result_dict = user_agent_parser.Parse(ua_string)
         referer_url = re.search("(?P<url>https?://[^\s]+)", ua_string)
-        ua_info_dict = {'device' : result_dict['device']['family'],'os' : result_dict['os']['family'], 'browser' : result_dict['user_agent']['family']}
+        ua_info_dict = {'device' : result_dict['device']['family'],'os' : result_dict['os']['family'], 'browser' : result_dict['user_agent']['family'], 'browser_version' : result_dict['user_agent']['major']}
         if referer_url is not None:
             ua_info_dict['referer'] = Referer(referer_url.group("url")).uri[1]
         else:
@@ -89,7 +92,7 @@ class LogAnalyzer:
             self.to_date = datetime.now()
         self.log_data = self.collection.find({'date' : {"$gte": self.from_date, "$lt" : self.to_date}})
 
-        self.log_fields = ['client_ip','date','request','status','request_size','browser_string','device' ,'os','browser','referer', 'request_country']
+        self.log_fields = ['client_ip','date','request','status','request_size','browser_string','device' ,'os','browser','browser_version' ,'referer', 'request_country']
 
     def load_apache_logs_into_DataFrame(self):
         # log_data = self.collection.find()
