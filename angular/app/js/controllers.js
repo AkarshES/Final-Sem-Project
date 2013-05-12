@@ -102,6 +102,10 @@ function LogViewerCtrl($scope, $http, $routeParams, $filter){
 
     $scope.retrieve_logs($scope.currentPage);
 
+    $scope.chk=function(id){
+        return(!($("#chk"+id).hasClass("checked")));
+    }
+
 }
 
 function AddTableCtrl($scope, $http, $routeParams){
@@ -242,6 +246,7 @@ function GraphCtrl ($scope, $http, $routeParams,$filter) {
                 //console.log($scope.hits)
                 getHits($scope.hits)
             });
+
 
 
 }

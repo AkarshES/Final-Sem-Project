@@ -1,3 +1,32 @@
+<script type="text/javascript">
+    $(document).ready(function() {
+      /* Multi select - allow multiple selections */
+      /* Allow click without closing menu */
+      /* Toggle checked state and icon */
+      $('.multicheck').click(function(e) {     
+         $(this).toggleClass("checked"); 
+         $(this).find("span").toggleClass("icon-ok"); 
+         return false;
+      });
+      /* Single Select - allow only one selection */  
+      /* Toggle checked state and icon and also remove any other selections */  
+       $('.singlecheck').click(function (e) {
+            $(this).parent().siblings().children().removeClass("checked");
+            $(this).parent().siblings().children().find("span").removeClass("icon-ok");
+            $(this).toggleClass("checked");
+            $(this).find("span").toggleClass("icon-ok");
+            return false;
+        });
+ 
+      /* To check whether an item is checked use the hasClass method */
+      alert($("#chkB").hasClass("checked"));
+        
+    });
+    
+    
+ 
+    
+  </script>
 <div class="container">
 
 <div class="masthead">
@@ -31,18 +60,6 @@
  <div class="well">
 <div class="input-append">
   <input class="span9" ng-model="log_row_filter" id="appendedDropdownButton" type="text" placeholder="Filter log file">
-  <!-- 
-  <div class="btn-group">
-    <button class="btn dropdown-toggle" data-toggle="dropdown">
-      Action
-      <span class="caret"></span>
-    </button>
-
-    <ul class="dropdown-menu">
-      <li><a href="#">Action</a></li>
-    </ul>
-
-  </div> -->
 
 </div>
 <form name="log_datetime_range" class="form-inline">
@@ -69,30 +86,76 @@
     <span ng-show="isInvalidDateRange || log_datetime_range.$invalid"><strong>Invalid date range</strong></span>
   </form>
  </div>
+<div class="container"> 
 <span ng-show="LogData.length > 0">
+<div class="columns btn-group pull-right">
+                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Show/Hide Columns <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                          
+                          <li><a id="chkA" ng-click="chka = chk('A')" class="multicheck checked" href="">Time
+                            <span class="icon-ok pull-right"></span></a></li>
+                          <li><a id="chkB" ng-click="chkb = chk('B')" class="multicheck checked" href="">Client
+                            <span class="icon-ok pull-right"></span></a></li>
+                          <li><a id="chkC" ng-click="chkc = chk('C')" class="multicheck checked" href="">Status
+                            <span class="icon-ok pull-right"></span></a></li>
+                          <li><a id="chkD" ng-click="chkd = chk('D')" class="multicheck checked" href="">Request
+                            <span class="icon-ok pull-right"></span></a></li>
+                          <li><a id="chkE" ng-click="chke = chk('E')" class="multicheck checked" href="">Country
+                          <span class="icon-ok pull-right"></span></a></li>
+                          <li><a id="chkF" ng-click="chkf = chk('F')" class="multicheck checked" href="">Referrer
+                          <span class="icon-ok pull-right"></span></a></li>
+                          <li><a id="chkG" ng-click="chkg = chk('G')" class="multicheck checked" href="">OS
+                          <span class="icon-ok pull-right"></span></a></li>
+                          <li><a id="chkG" ng-click="chkh = chk('H')" class="multicheck checked" href="">Browser
+                          <span class="icon-ok pull-right"></span></a></li>
+                          <div class="clearfix"></div>
+
+                        </ul>
+  </div>
+
+
   <pagination boundary-links="true" num-pages="noOfPages" current-page="currentPage" max-size="maxSize" on-select-page="retrieve_logs(page)"></pagination>
-  <table class="table table-condensed table-striped logtable" cellspacing="0">
+  
+  
+  
+
+
+    <table class="table table-striped table-bordered table-condensed">
     <thead>
       <tr>
-        <td> Time </td>
-        <td> Client </td>
-        <td> Status </td>
-        <td> Request </td>
+        <th ng-hide="chka"> Time </th>
+        <th ng-hide="chkb"> Client </th>
+        <th ng-hide="chkc"> Status </th>
+        <th ng-hide="chkd"> Request </th>
+        <th ng-hide="chke">Request Country</th>
+        <th ng-hide="chkf">Referrer</th>
+        <th ng-hide="chkg">OS</th>
+        <th ng-hide="chkh">Browser</th>
+
       </tr>
     </thead>
     <tbody>
+      
       <tr ng-repeat = "row in LogData | filter:log_row">
-        <td style="width:11%;" class="date_column">{{row["date"] * 1000 | date:'medium' }}</td>
-        <td style="width:8%;" class="ip_column">{{row["client_ip"]}}</td>
-        <td style="width:3%;" class="status_column">{{row["status"]}}</td>
-        <td style="width:40%;" class="request_column">{{row["request"]}}</td>
+        <td  class="date_column" ng-hide="chka" ng-bind-template="{{row['date'] * 1000 | date:'medium' }}"></td>
+        <td  class="ip_column" ng-hide="chkb">{{row["client_ip"]}}</td>
+        <td  class="status_column" ng-hide="chkc">{{row["status"]}}</td>
+        <td  class="request_column" ng-hide="chkd">{{row["request"]}}</td>
+        <td  class="request_column" ng-hide="chke">{{row["request_country"]}}</td>
+        <td  class="request_column" ng-hide="chkf">{{row["referer"]}}</td>
+        <td  class="request_column" ng-hide="chkg">{{row["os"]}}</td>
+        <td  class="request_column" ng-hide="chkh">{{row["browser"]}}</td>
       </tr>
+      
     </tbody>
   </table>
+
   <pagination boundary-links="true" num-pages="noOfPages" current-page="currentPage" max-size="maxSize" on-select-page="retrieve_logs(page)"></pagination>
 </span>
-<span ng-show="LogData.length == 0" class="text-center"><div class="alert alert-info">
+<span ng-show="LogData.length == 0" class="text-center">
+  <div class="alert alert-info">
   No Logs were found in the given range
-</div></span>
-
+</div>
+</span>
+</div>
 </div>

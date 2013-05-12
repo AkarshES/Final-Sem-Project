@@ -12,7 +12,7 @@ App.config(['$routeProvider', function($routeProvider) {
             templateUrl:"static/partials/logViewer.html",
             controller:"LogViewerCtrl"
         })
-         .when('/AddNewTable', {
+        .when('/AddNewTable', {
             templateUrl:'static/partials/fileUpload.html',
             controller:"AddTableCtrl"
         })
