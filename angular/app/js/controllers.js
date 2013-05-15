@@ -132,7 +132,7 @@ function AddTableCtrl($scope, $http, $routeParams){
 
 function GraphCtrl ($scope, $http, $routeParams,$filter) {
     
-    $scope.data="testing";
+    
     
     $scope.logset = $filter('filter')($scope.logsets, {name: $routeParams.table_name})[0];
     
@@ -148,10 +148,8 @@ function GraphCtrl ($scope, $http, $routeParams,$filter) {
                     })
             .success(function(response_json, status){
                 $scope.LogData = response_json.data;
-                $scope.gData=transform_status($scope.LogData);
-                console.log(transform_status($scope.LogData))
-                //var test=($scope.LogData);
-                var status=[{"label":"200","y":34473},{"label":"206","y":124},{"label":"301","y":99},{"label":"302","y":3415},{"label":"304","y":637},{"label":"403","y":12},{"label":"404","y":1010},{"label":"500","y":230}];
+                $scope.gData=transform($scope.LogData,"status");
+                var status=$scope.gData;
                 var chart = new CanvasJS.Chart("chartContainer", {
 
                       title:{
@@ -169,8 +167,8 @@ function GraphCtrl ($scope, $http, $routeParams,$filter) {
                      ]
                     }
                 );
-
-                    chart.render();
+                          
+                chart.render();
             
             });
 
@@ -186,8 +184,9 @@ function GraphCtrl ($scope, $http, $routeParams,$filter) {
             .success(function(response_json, status){
                 $scope.LogData = response_json.data;
                 $scope.gData=transform_os($scope.LogData);
-                console.log(transform_os($scope.LogData))
+                console.log(transform_os($scope.LogData,"os"))
                 //var test=($scope.LogData);
+                 
                 var chart = new CanvasJS.Chart("chartContainer2", {
 
                       title:{
@@ -209,7 +208,7 @@ function GraphCtrl ($scope, $http, $routeParams,$filter) {
                     chart.render();
             
             });
-            var browser= [{"label":"Avant","y":2},{"label":"Camino","y":4},{"label":"Chrome","y":98},{"label":"Firefox","y":1418},{"label":"Firefox (Minefield)","y":23},{"label":"Firefox (Shiretoko)","y":7},{"label":"Firefox Beta","y":5},{"label":"Googlebot","y":7577},{"label":"IE","y":7171},{"label":"Iron","y":1},{"label":"Maxthon","y":3},{"label":"Mobile Safari","y":95},{"label":"MyIE2","y":2},{"label":"NetNewsWire","y":205},{"label":"Opera","y":90},{"label":"Other","y":21649},{"label":"Safari","y":152},{"label":"Sleipnir","y":2},{"label":"Slurp","y":1486},{"label":"UP.Browser","y":4},{"label":"WebKit Nightly","y":6}]
+           
             console.log(transform_browser(browser))
 
             var chart = new CanvasJS.Chart("chartContainer3", {
@@ -261,39 +260,51 @@ function getHits(data){
   },hits);  
   console.log(hits)
 }
-function transform_status(data) {
+function transform(data,type) {
     var t_data = [];
-  angular.forEach(data, function(value, key){
-    this.push({ label : value.status ,y: value.count })
-    //this.push('y' + ':' + value)
+    
+  
+    //this.push({ label : value.status ,y: value.count })
+    switch(type){
+      case "status" :
+            angular.forEach(data, function(value, key){
+            var temp = {};  
+            temp.label = String(value.status);
+            temp.y = value.count;
+            //console.log(temp)
+            this.push(temp);
+            
+            
+            },t_data);
+            break;
+      case "os" :
+            angular.forEach(data, function(value, key){
+            var temp = {};  
+            temp.label = String(value.os);
+            temp.y = value.count;
+            //console.log(temp)
+            this.push(temp);
+            
+            
+            },t_data);
+            break;  
+      case "browser" :
+            angular.forEach(data, function(value, key){
+            var temp = {};  
+            temp.label = String(value.browser);
+            temp.y = value.count;
+            //console.log(temp)
+            this.push(temp);
+            
+            
+            },t_data);
+            break;  
    
-  },t_data);
-   
-   return (JSON.stringify(t_data));
+    }
+   //console.log("Inside status",t_data);
+   return ((t_data));
 }
 
-function transform_os(data) {
-    var t_data = [];
-  angular.forEach(data, function(value, key){
-    this.push({ label : value.os ,y: value.count })
-    //this.push('y' + ':' + value)
-   
-  },t_data);
-   
-   return (JSON.stringify(t_data));
-}
 
 
-function transform_browser(data) {
-    var t_data = [];
-  angular.forEach(data, function(value, key){
-    this.push({ label : value.browser ,y: value.count })
-    //this.push('y' + ':' + value)
-   
-  },t_data);
-   
-   return (JSON.stringify(t_data));
-}
 
-
-var os=[{"label":"Fedora","y":4},{"label":"Linux","y":530},{"label":"Mac OS X","y":348},{"label":"Other","y":30315},{"label":"Red Hat","y":9},{"label":"SUSE","y":3},{"label":"Ubuntu","y":139},{"label":"Windows","y":10},{"label":"Windows 2000","y":35},{"label":"Windows 7","y":24},{"label":"Windows 98","y":10},{"label":"Windows Vista","y":2121},{"label":"Windows XP","y":6357},{"label":"iOS","y":95}] ;
