@@ -147,9 +147,9 @@ function GraphCtrl ($scope, $http, $routeParams,$filter) {
                         }
                     })
             .success(function(response_json, status){
-                $scope.LogData = response_json.data;
-                $scope.gData=transform($scope.LogData,"status");
-                var status=$scope.gData;
+                $scope.data = response_json.data;
+                $scope.gData=transform($scope.data,"status");
+                //var status=$scope.gData;
                 var chart = new CanvasJS.Chart("chartContainer", {
 
                       title:{
@@ -162,7 +162,7 @@ function GraphCtrl ($scope, $http, $routeParams,$filter) {
                          /*** Change type "column" to "bar", "area", "line" or "pie"***/
                          type: "pie",
                          //showInLegend: true,
-                         dataPoints : status
+                         dataPoints : $scope.gData
                         }
                      ]
                     }
@@ -172,6 +172,7 @@ function GraphCtrl ($scope, $http, $routeParams,$filter) {
             
             });
 
+//For OS stats
     $http.get(
                     '/data/'+$scope.logset.name,
                     {
@@ -182,9 +183,9 @@ function GraphCtrl ($scope, $http, $routeParams,$filter) {
                         }
                     })
             .success(function(response_json, status){
-                $scope.LogData = response_json.data;
-                $scope.gData=transform_os($scope.LogData);
-                console.log(transform_os($scope.LogData,"os"))
+                $scope.data = response_json.data;
+                $scope.gData=transform($scope.data,"os");
+                //console.log(transform($scope.LogData,"os"))
                 //var test=($scope.LogData);
                  
                 var chart = new CanvasJS.Chart("chartContainer2", {
@@ -199,7 +200,7 @@ function GraphCtrl ($scope, $http, $routeParams,$filter) {
                          /*** Change type "column" to "bar", "area", "line" or "pie"***/
                          type: "pie",
                        
-                         dataPoints : os
+                         dataPoints : $scope.gData
                         }
                      ]
                     }
@@ -209,12 +210,27 @@ function GraphCtrl ($scope, $http, $routeParams,$filter) {
             
             });
            
-            console.log(transform_browser(browser))
-
-            var chart = new CanvasJS.Chart("chartContainer3", {
+    //For Broswer stats
+        
+        $http.get(
+                    '/data/'+$scope.logset.name,
+                    {
+                        params:{
+                            op : "count",
+                            field : "browser"
+                            
+                        }
+                    })
+            .success(function(response_json, status){
+                $scope.data = response_json.data;
+                $scope.gData=transform($scope.data,"browser");
+                //console.log(transform($scope.LogData,"os"))
+                //var test=($scope.LogData);
+                 
+                var chart = new CanvasJS.Chart("chartContainer2", {
 
                       title:{
-                        text: "Browser Statistics"    ,
+                        text: "Broswer Statistics"    ,
                         fontSize: 40,
                       },
                       data: [//array of dataSeries              
@@ -222,31 +238,16 @@ function GraphCtrl ($scope, $http, $routeParams,$filter) {
 
                          /*** Change type "column" to "bar", "area", "line" or "pie"***/
                          type: "pie",
-                        
-                         dataPoints : browser
+                       
+                         dataPoints : $scope.gData
                         }
                      ]
                     }
                 );
 
                     chart.render();
-        
-    $http.get(
-                    '/data/'+$scope.logset.name,
-                    {
-                        params:{
-                            op : "count",
-                            field : "request"
-                            
-                        }
-                    })
-            .success(function(response_json, status){
-                $scope.hits = response_json.data;
-                //console.log($scope.hits)
-                getHits($scope.hits)
+            
             });
-
-
 
 }
 
@@ -260,6 +261,9 @@ function getHits(data){
   },hits);  
   console.log(hits)
 }
+
+
+
 function transform(data,type) {
     var t_data = [];
     
