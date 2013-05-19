@@ -9,9 +9,14 @@ from ua_parser import user_agent_parser
 from numpy import asscalar
 from urlparse import urlparse
 import pygeoip
+import os
 class LogParser:
     def __init__(self, db = 'test'):
-        self.client = MongoClient()
+        mongolab_uri = os.environ.get('MONGOLAB_URI')
+        if mongolab_uri:
+            self.client = MongoClient(host = mongolab_uri)
+        else:
+            self.client = MongoClient()
         self.db = self.client[db]
         self.geoip = pygeoip.GeoIP('./GeoIP.dat', pygeoip.MEMORY_CACHE) # change the path on your machine. get it from http://dev.maxmind.com/geoip/install/country
     
