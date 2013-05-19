@@ -10,8 +10,14 @@ from numpy import asscalar
 from urlparse import urlparse
 import pygeoip
 import os
+
+if os.environ.get('MONGOLAB_URI'):
+    default_db = 'final'
+else:
+    default_db = 'test'
+
 class LogParser:
-    def __init__(self, db = 'test'):
+    def __init__(self, db = default_db):
         mongolab_uri = os.environ.get('MONGOLAB_URI')
         if mongolab_uri:
             self.client = MongoClient(host = mongolab_uri)
@@ -81,7 +87,7 @@ class CollectionNotFound(Exception):
     pass
 
 class LogAnalyzer:    
-    def __init__(self, db = 'test', collection = 'None', from_date = None, to_date = None):
+    def __init__(self, db = default_db, collection = 'None', from_date = None, to_date = None):
         mongolab_uri = os.environ.get('MONGOLAB_URI')
         if mongolab_uri:
             self.client = MongoClient(host = mongolab_uri)
