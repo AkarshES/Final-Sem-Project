@@ -19,11 +19,20 @@ app = Flask(
 app.jinja_env.variable_start_string = '{['
 app.jinja_env.variable_end_string = ']}'
 
-#create the db connection, username and password only set if it exists
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
-app.config['MONGODB_USERNAME'] = os.environ.get('MONGO_DB_USERNAME')
-app.config['MONGODB_PASSWORD'] = os.environ.get('MONGO_DB_PASSWORD')
-app.config['MONGODB_DB'] = 'test'
+
+#create the db connection, username and password only set if it exists
+if os.environ.get('ENV', 'dev') == 'pro':
+    print 'HERE'
+    DEBUG = False
+    app.config['MONGODB_HOST'] = os.environ.get('MONGOLAB_URI')
+    app.config['MONGODB_DB'] = 'final'
+else:
+    print 'NOT_HERE'
+    app.config['MONGODB_USERNAME'] = os.environ.get('MONGO_DB_USERNAME')
+    app.config['MONGODB_PASSWORD'] = os.environ.get('MONGO_DB_PASSWORD')
+    app.config['MONGODB_DB'] = 'test'
+
 db = MongoEngine(app)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
