@@ -82,7 +82,11 @@ class CollectionNotFound(Exception):
 
 class LogAnalyzer:    
     def __init__(self, db = 'test', collection = 'None', from_date = None, to_date = None):
-        self.client = MongoClient()
+        mongolab_uri = os.environ.get('MONGOLAB_URI')
+        if mongolab_uri:
+            self.client = MongoClient(host = mongolab_uri)
+        else:
+            self.client = MongoClient()
         self.db = self.client[db]
         self.from_date = from_date
         self.to_date = to_date
