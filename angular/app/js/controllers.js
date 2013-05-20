@@ -245,7 +245,7 @@ function GraphCtrl ($scope, $http, $routeParams,$filter) {
                 var chart = new CanvasJS.Chart("chartContainer3", {
 
                       title:{
-                        text: "Broswer Statistics"    ,
+                        text: "Browser Statistics"    ,
                         fontSize: 20,
                       },
                        legend: {
