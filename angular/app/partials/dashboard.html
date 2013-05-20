@@ -161,6 +161,34 @@ body{
       </table>
     </div>
   </li>
+
+    <li>
+      <div id="countryList">
+        <span class="pull-right">
+          <!-- <a href="#/countryList/{{logset.name}}" title = "View full list" target = "_blank" >Full list&nbsp; </a> -->
+        </span>
+      <h4>&nbsp;Referer (Top10) </h4>
+      
+      <table class="table table-striped">
+              <thead>
+                <tr>
+                
+                  <th>Referer</th>
+                  <th>Count</th>
+                  
+                </tr>
+              </thead>
+              <tbody ng-init="order = 'count';reverse = true;limit = 10">
+                <tr ng-repeat="ref in referer | orderBy:order:reverse | limitTo:limit">
+                  
+                  <td>{{ref.referer}}</td>
+                  <td>{{ref.count}}</td>
+                </tr>
+                
+              </tbody>
+      </table>
+    </div>
+  </li>
 </ul>
 </div>
  <!--Row 2-->

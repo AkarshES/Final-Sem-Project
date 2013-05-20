@@ -325,6 +325,24 @@ function GraphCtrl ($scope, $http, $routeParams,$filter) {
                 
                 }); 
 
+  //Referer 
+  
+    $http.get(
+                    '/data/'+$scope.logset.name,
+                    {
+                        params:{
+                            op : "count",
+                            field : "referer"
+                            
+                        }
+                    })
+            .success(function(response_json, status){
+                $scope.referer = response_json.data;
+                console.log($scope.referer)
+                
+                
+                });             
+
 
 
 }
