@@ -1,0 +1,25 @@
+  <div class="container">
+
+    <div class = "pull-right">
+       <input type="text" ng-model="search" placeholder="Search Countries">
+    </div>
+    <h4>Country List</h4>
+  <table class="table table-striped">
+              <thead>
+                <tr>
+                
+                  <th>Country</th>
+                  <th>Visits</th>
+                  
+                </tr>
+              </thead>
+              <tbody ng-init="order = 'count';reverse = true;limit = 10">
+                <tr ng-repeat="country in countryCount | orderBy:order:reverse | filter : search">
+                  
+                  <td>{{country.request_country}}</td>
+                  <td>{{country.count}}</td>
+                </tr>
+                
+              </tbody>
+      </table>
+</div>

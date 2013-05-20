@@ -24,6 +24,14 @@ App.config(['$routeProvider', function($routeProvider) {
             templateUrl:"static/partials/dashboard.html",
             controller:"GraphCtrl"
         })
+        .when('/countryList/:table_name',{
+            templateUrl:"static/partials/country.html",
+            controller:"CountryCtrl"
+        })
+        .when('/requestList/:table_name',{
+            templateUrl:"static/partials/request.html",
+            controller:"RequestCtrl"
+        })
         .otherwise({
             redirectTo:'/'
         });

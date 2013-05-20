@@ -1,4 +1,7 @@
 <style type="text/css">
+body{
+  background-color: #E8E8E8;
+}
   .dashboard{
   padding-top: 30px;
 }
@@ -6,8 +9,58 @@
   position: relative;
   left: 30px;
 }
-</style>
+.chartContainer3{
+  position: relative;
+  margin-left: -100px;
+}
+.count{
+  padding-top: 50px;       
+  font-size: 80px;
+  color: orange;
   
+}
+.two{
+  height: 250px;
+}
+.wrap{
+  
+  padding-top: 100px;
+  padding-left: 30px;
+  padding-bottom:80px;
+  /*border-style: solid;
+  border-color: black*/
+
+
+}
+
+.desc{
+  float: right;
+  padding-right: 80px;
+  font-size: 40px;
+  color: gray;
+
+}
+</style>
+<link rel="stylesheet" href="static/css/style.css"/>
+  <script type="text/javascript">
+    $(document).ready(new function() {
+      // Prepare layout options.
+     var options = {
+        itemWidth: 600, // Optional min width of a grid item
+        autoResize: true, // This will auto-update the layout when the browser window is resized.
+        container: $('#content'), // Optional, used for some extra CSS styling
+        offset: 15, // Optional, the distance between grid items
+        flexibleWidth: 600 // Optional, the maximum width of a grid item
+      };
+      // Get a reference to your grid items.
+      var handler = $('#tiles li');
+
+      // Call the layout function.
+      handler.wookmark(options);
+
+     
+    });
+  </script>
 <div class="container">
   <div class="masthead">
         <ul class="nav nav-pills pull-right">
@@ -15,38 +68,101 @@
           <li><a href="#/logviewer/{{logset.name}}">Log Viewer</a></li>
           
         </ul>
-        <h4 class="muted">{{logset.name}}</h4>
+        <h3 class="muted">{{logset.name}}</h3>
 </div>
 <br>
-<!-- <div class="summary">
-<table class="table table-striped">
+ <div id="content" class="container">
+  
+  <ul id="tiles">
+
+     <li class = "two">
+      <div class = "wrap">
+      <span class = "count" ng-bind = "visitors"></span>
+      <div class = "desc" style="padding-right:60px;"> 
+        Unique visitors
+      </div>
+      
+      </div>
+    </li>
+   
+   
+    </li>
+    <li> <div id="chartContainer" class="span6" style="height: 400px;width:420px;"> </div></li>
+
+    <li> <div id="chartContainer2" class="span6"style="height: 600px;width:530px;"> </div></li>
+   
+   
+    <li class = "two">
+      <div class = "wrap">
+      <span class = "count"ng-bind="visits"></span>
+      <div class = "desc "> 
+        Total Visits
+      </div>
+      
+      </div>
+     
+    </li>
+  
+
+     <li>
+      <div id="urlList">
+        <span class="pull-right">
+          <a href="#/requestList/{{logset.name}}" title = "View full list" target = "_blank">Full list&nbsp; </a>
+        </span>
+        <h4>&nbsp;Page URL (Top10) </h4>
+        <table class="table table-striped">
+                <thead>
+                  <tr>
+                  
+                    <th>Page URL</th>
+                    <th>Visits</th>
+                    
+                  </tr>
+                </thead>
+                <tbody ng-init="order = 'count';reverse = true;limit = 10">
+                  <tr ng-repeat="request in requests | orderBy:order:reverse | limitTo:limit">
+                    
+                    <td>{{request.request}}</td>
+                    <td>{{request.count}}</td>
+                  </tr>
+                  
+                </tbody>
+        </table>
+      </div>
+    </li>
+  <li> <div id="chartContainer3" class="span6"style="height: 600px;width:540px;"> </div></li>
+
+  
+   <li>
+      <div id="countryList">
+        <span class="pull-right">
+          <a href="#/countryList/{{logset.name}}" title = "View full list" target = "_blank" >Full list&nbsp; </a>
+        </span>
+      <h4>&nbsp;Country (Top10) </h4>
+      
+      <table class="table table-striped">
               <thead>
                 <tr>
-                 
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Username</th>
+                
+                  <th>Country</th>
+                  <th>Visits</th>
+                  
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                 
-                  <td>Mark</td>
-                  <td>Otto</td>
-                  <td>@mdo</td>
+              <tbody ng-init="order = 'count';reverse = true;limit = 10">
+                <tr ng-repeat="country in countryCount | orderBy:order:reverse | limitTo:limit">
+                  
+                  <td>{{country.request_country}}</td>
+                  <td>{{country.count}}</td>
                 </tr>
-               
+                
               </tbody>
-            </table>
-</div> -->
- <div class="row">
-    
-    <div id="chartContainer" class="span6" style="height: 600px; width: 100%;"> </div>
-    <div id="chartContainer2" class="span6"style="height: 900px; width: 100%;"> </div>
-    <div id="chartContainer3" class="span6"style="height: 600px; width: 100%;"> </div>
-
-
-</div> 
-<div class="dashboard">
-
+      </table>
+    </div>
+  </li>
+</ul>
 </div>
+ <!--Row 2-->
+<ul id="row2">
+
+</ul>  

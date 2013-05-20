@@ -154,14 +154,22 @@ function GraphCtrl ($scope, $http, $routeParams,$filter) {
 
                       title:{
                         text: "HTTP status count" ,
-                        fontSize: 40,
+                        fontSize: 20,
                       },
+                      
+                      legend: {
+                        verticalAlign: "center",  // "top" , "bottom"
+                        horizontalAlign:"right"
+                        },
+                        
                       data: [//array of dataSeries              
                         { //dataSeries object
 
                          /*** Change type "column" to "bar", "area", "line" or "pie"***/
                          type: "pie",
-                         //showInLegend: true,
+                         showInLegend: true,
+                         indexLabelFontColor:"white",
+                         indexLabelLineColor:"white",
                          dataPoints : $scope.gData
                         }
                      ]
@@ -192,14 +200,21 @@ function GraphCtrl ($scope, $http, $routeParams,$filter) {
 
                       title:{
                         text: "Operating System Statistics"    ,
-                        fontSize: 40,
+                        fontSize: 20,
                       },
+
+                      legend: {
+                        verticalAlign: "center",  // "top" , "bottom"
+                        horizontalAlign:"left"
+                        },
                       data: [//array of dataSeries              
                         { //dataSeries object
 
                          /*** Change type "column" to "bar", "area", "line" or "pie"***/
                          type: "pie",
-                       
+                         showInLegend: true,
+                         indexLabelFontColor:"white",
+                         indexLabelLineColor:"white",
                          dataPoints : $scope.gData
                         }
                      ]
@@ -227,18 +242,25 @@ function GraphCtrl ($scope, $http, $routeParams,$filter) {
                 //console.log(transform($scope.LogData,"os"))
                 //var test=($scope.LogData);
                  
-                var chart = new CanvasJS.Chart("chartContainer2", {
+                var chart = new CanvasJS.Chart("chartContainer3", {
 
                       title:{
                         text: "Broswer Statistics"    ,
-                        fontSize: 40,
+                        fontSize: 20,
                       },
+                       legend: {
+                        horizontalAlign: "left", // "center" , "right"
+                        verticalAlign: "bottom",  // "top" , "bottom"
+                        fontSize: 15,
+                    },
                       data: [//array of dataSeries              
                         { //dataSeries object
 
                          /*** Change type "column" to "bar", "area", "line" or "pie"***/
                          type: "pie",
-                       
+                         showInLegend: true,
+                         indexLabelFontColor:"white",
+                         indexLabelLineColor:"white",                         
                          dataPoints : $scope.gData
                         }
                      ]
@@ -249,20 +271,116 @@ function GraphCtrl ($scope, $http, $routeParams,$filter) {
             
             });
 
+
+//Country List
+
+   $http.get(
+                    '/data/'+$scope.logset.name,
+                    {
+                        params:{
+                            op : "count",
+                            field : "request_country"
+                            
+                        }
+                    })
+            .success(function(response_json, status){
+                $scope.countryCount = response_json.data;
+                //console.log($scope.countryCount)
+                
+                }); 
+
+
+//Request URL
+    $http.get(
+                    '/data/'+$scope.logset.name,
+                    {
+                        params:{
+                            op : "count",
+                            field : "request"
+                            
+                        }
+                    })
+            .success(function(response_json, status){
+                $scope.requests = response_json.data;
+                //console.log($scope.requests)
+                
+                }); 
+
+
+//Client IP
+     $http.get(
+                    '/data/'+$scope.logset.name,
+                    {
+                        params:{
+                            op : "count",
+                            field : "client_ip"
+                            
+                        }
+                    })
+            .success(function(response_json, status){
+                $scope.ip = response_json.data;
+                $scope.visitors = $scope.ip.length;
+                $scope.visits = getCount($scope.ip);
+                
+                
+                }); 
+
+
+
 }
 
-function getHits(data){
-    var hits=0;
-  angular.forEach(data, function(value, key){
-    //this.push({ label : value.status ,y: value.count })
-    //this.push('y' + ':' + value)
-   this.hits += parseInt(value.count);
 
-  },hits);  
-  console.log(hits)
+
+function CountryCtrl  ($scope, $http, $routeParams,$filter) {
+    
+    
+
+    $scope.logset = $filter('filter')($scope.logsets, {name: $routeParams.table_name})[0];
+     $http.get(
+                    '/data/'+$scope.logset.name,
+                    {
+                        params:{
+                            op : "count",
+                            field : "request_country"
+                            
+                        }
+                    })
+            .success(function(response_json, status){
+                $scope.countryCount = response_json.data;
+                //console.log($scope.countryCount)
+                
+                }); 
+
+
+
 }
 
 
+function RequestCtrl  ($scope, $http, $routeParams,$filter) {
+    
+    
+
+    $scope.logset = $filter('filter')($scope.logsets, {name: $routeParams.table_name})[0];
+     $http.get(
+                    '/data/'+$scope.logset.name,
+                    {
+                        params:{
+                            op : "count",
+                            field : "request"
+                            
+                        }
+                    })
+            .success(function(response_json, status){
+                $scope.requests = response_json.data;
+                //console.log($scope.requests)
+                
+                }); 
+
+
+
+
+
+}
 
 function transform(data,type) {
     var t_data = [];
@@ -271,10 +389,12 @@ function transform(data,type) {
     //this.push({ label : value.status ,y: value.count })
     switch(type){
       case "status" :
+            var sCount = getCount(data);
             angular.forEach(data, function(value, key){
             var temp = {};  
             temp.label = String(value.status);
-            temp.y = value.count;
+            temp.y = ((value.count/sCount)*100).toFixed(2);
+            temp.legendText = String(temp.y)+"% "+String(value.status);
             //console.log(temp)
             this.push(temp);
             
@@ -282,22 +402,26 @@ function transform(data,type) {
             },t_data);
             break;
       case "os" :
+            var oCount = getCount(data);
             angular.forEach(data, function(value, key){
             var temp = {};  
             temp.label = String(value.os);
-            temp.y = value.count;
-            //console.log(temp)
+            temp.y = ((value.count/oCount)*100).toFixed(2);;
+            temp.legendText = String(temp.y)+"% "+String(value.os);
+            //console.log(temp);  
             this.push(temp);
             
             
             },t_data);
             break;  
       case "browser" :
+            var bCount = getCount(data);
             angular.forEach(data, function(value, key){
             var temp = {};  
             temp.label = String(value.browser);
-            temp.y = value.count;
-            //console.log(temp)
+            temp.y = ((value.count/bCount)*100).toFixed(2);;
+            temp.legendText = String(temp.y)+"% "+String(value.browser);
+            //console.log(temp);  
             this.push(temp);
             
             
@@ -310,5 +434,23 @@ function transform(data,type) {
 }
 
 
+function getVisits(data){
+    var hits=0;
+  angular.forEach(data, function(value, key){
+    //this.push({ label : value.status ,y: value.count })
+    //this.push('y' + ':' + value)
+   this.hits += parseInt(value.count);
+
+  },hits);  
+  console.log(hits)
+}
 
 
+function getCount (data) {
+    var count = 0;
+    angular.forEach(data, function(value, key){
+        count += value.count;
+
+    })
+    return count;
+}

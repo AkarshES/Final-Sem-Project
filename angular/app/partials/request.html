@@ -1,0 +1,25 @@
+  <div class="container">
+
+    <div class = "pull-right">
+       <input type="text" ng-model="search" placeholder="Search Requests">
+    </div>
+   <h4>&nbsp;Page URL List</h4>
+        <table class="table table-striped">
+                <thead>
+                  <tr>
+                  
+                    <th>Page URL</th>
+                    <th>Visits</th>
+                    
+                  </tr>
+                </thead>
+                <tbody ng-init="order = 'count';reverse = true;limit = 10">
+                  <tr ng-repeat="request in requests | orderBy:order:reverse | filter : search">
+                    
+                    <td>{{request.request}}</td>
+                    <td>{{request.count}}</td>
+                  </tr>
+                  
+                </tbody>
+        </table>
+</div>
