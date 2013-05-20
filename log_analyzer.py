@@ -57,6 +57,8 @@ class LogParser:
                     log_data['request_size'] = int(log_data['request_size'])
                 log_data.update(self.extract_user_agent_info(log_data['browser_string']))
                 request_country = self.geoip.country_name_by_addr(search[0])
+                if len(request_country) is 0:
+                    request_country = 'NA'
                 log_data['request_country'] = request_country
                 count += 1
                 log_list.append(log_data)
