@@ -2,7 +2,7 @@ from log_analyzer import LogAnalyzer, LogParser
 # from json import json
 if __name__ == '__main__':
     lp = LogParser()
-    lp.load_apache_log_file_into_DB('access.1','access_log')
+    lp.load_apache_log_file_into_DB('access.2','access_log')
     # lp.load_apache_log_file_into_DB('access_log_2','access_log')
     # lp.load_apache_log_file_into_DB('access_log_3','access_log')
     # lp.load_apache_log_file_into_DB('access_log_4','access_log')
