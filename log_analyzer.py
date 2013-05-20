@@ -9,9 +9,20 @@ from ua_parser import user_agent_parser
 from numpy import asscalar
 from urlparse import urlparse
 import pygeoip
+import os
+
+if os.environ.get('MONGOLAB_URI'):
+    default_db = 'final'
+else:
+    default_db = 'test'
+
 class LogParser:
-    def __init__(self, db = 'test'):
-        self.client = MongoClient()
+    def __init__(self, db = default_db):
+        mongolab_uri = os.environ.get('MONGOLAB_URI')
+        if mongolab_uri:
+            self.client = MongoClient(host = mongolab_uri)
+        else:
+            self.client = MongoClient()
         self.db = self.client[db]
         self.geoip = pygeoip.GeoIP('./GeoIP.dat', pygeoip.MEMORY_CACHE) # change the path on your machine. get it from http://dev.maxmind.com/geoip/install/country
     
@@ -24,13 +35,13 @@ class LogParser:
         Reads the log data from 'file_name' and loads it into 'collection_name' in MongoDB
         """
         fields = ['client_ip','date','request','status','request_size','browser_string']
-        apache_log_regex = '([\da-zA-Z:\.\-]+) - [^ ]+ \[(.*?)\] "(.*?)" (\d+) ((\d+)|-) ("-")?(.*?) "(.*?)"'
+        apache_log_regex = '([\da-zA-Z:\.\-]+) - [^ ]+[ ]+\[(.*?)\] "(.*?)" (\d+) ((\d+)|-) ("-")?(.*?) "(.*?)"'
         compiled_apache_log_regex = re.compile(apache_log_regex)
         log_file = open(file_name,"r")
         count = 0
         log_list = []
         for line in log_file.readlines():
-            # try:
+            try:
                 search = compiled_apache_log_regex.match(line).groups()
                 date = dateutil.parser.parse(search[1].replace(':', ' ', 1))
                 date = (datetime(date.year,date.month,date.day,date.hour,date.minute,date.second),)
@@ -53,8 +64,8 @@ class LogParser:
                     count = 0
                     self.log_insert(collection_name,log_list)
                     log_list = []
-            # except :
-                # print line
+            except :
+                print line
 
         if collection_name not in self.db.collection_names():
             return False
@@ -76,8 +87,12 @@ class CollectionNotFound(Exception):
     pass
 
 class LogAnalyzer:    
-    def __init__(self, db = 'test', collection = 'None', from_date = None, to_date = None):
-        self.client = MongoClient()
+    def __init__(self, db = default_db, collection = 'None', from_date = None, to_date = None):
+        mongolab_uri = os.environ.get('MONGOLAB_URI')
+        if mongolab_uri:
+            self.client = MongoClient(host = mongolab_uri)
+        else:
+            self.client = MongoClient()
         self.db = self.client[db]
         self.from_date = from_date
         self.to_date = to_date

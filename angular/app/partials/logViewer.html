@@ -77,39 +77,31 @@
  </div>
 <div class="container"> 
 <span ng-show="LogData.length > 0">
-<div class="columns btn-group pull-right">
-                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Show/Hide Columns <span class="caret"></span></button>
-                <ul class="dropdown-menu">
-                          
-                          <li><a id="chkA" ng-click="chka = chk('A')" class="multicheck checked" href="">Time
-                            <span class="icon-ok pull-right"></span></a></li>
-                          <li><a id="chkB" ng-click="chkb = chk('B')" class="multicheck checked" href="">Client
-                            <span class="icon-ok pull-right"></span></a></li>
-                          <li><a id="chkC" ng-click="chkc = chk('C')" class="multicheck checked" href="">Status
-                            <span class="icon-ok pull-right"></span></a></li>
-                          <li><a id="chkD" ng-click="chkd = chk('D')" class="multicheck checked" href="">Request
-                            <span class="icon-ok pull-right"></span></a></li>
-                          <li><a id="chkE" ng-click="chke = chk('E')" class="multicheck checked" href="">Country
-                          <span class="icon-ok pull-right"></span></a></li>
-                          <li><a id="chkF" ng-click="chkf = chk('F')" class="multicheck checked" href="">Referrer
-                          <span class="icon-ok pull-right"></span></a></li>
-                          <li><a id="chkG" ng-click="chkg = chk('G')" class="multicheck checked" href="">OS
-                          <span class="icon-ok pull-right"></span></a></li>
-                          <li><a id="chkG" ng-click="chkh = chk('H')" class="multicheck checked" href="">Browser
-                          <span class="icon-ok pull-right"></span></a></li>
-                          <div class="clearfix"></div>
-
-                        </ul>
+  <div class="columns btn-group pull-right">
+    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Show/Hide Columns <span class="caret"></span></button>
+    <ul class="dropdown-menu">
+      <li><a id="chkA" ng-click="chka = chk('A')" class="multicheck checked" href="">Time
+        <span class="icon-ok pull-right"></span></a></li>
+      <li><a id="chkB" ng-click="chkb = chk('B')" class="multicheck checked" href="">Client
+        <span class="icon-ok pull-right"></span></a></li>
+      <li><a id="chkC" ng-click="chkc = chk('C')" class="multicheck checked" href="">Status
+        <span class="icon-ok pull-right"></span></a></li>
+      <li><a id="chkD" ng-click="chkd = chk('D')" class="multicheck checked" href="">Request
+        <span class="icon-ok pull-right"></span></a></li>
+      <li><a id="chkE" ng-click="chke = chk('E')" class="multicheck checked" href="">Country
+        <span class="icon-ok pull-right"></span></a></li>
+      <li><a id="chkF" ng-click="chkf = chk('F')" class="multicheck checked" href="">Referrer
+        <span class="icon-ok pull-right"></span></a></li>
+      <li><a id="chkG" ng-click="chkg = chk('G')" class="multicheck checked" href="">OS
+        <span class="icon-ok pull-right"></span></a></li>
+      <li><a id="chkG" ng-click="chkh = chk('H')" class="multicheck checked" href="">Browser
+        <span class="icon-ok pull-right"></span></a></li>
+      <div class="clearfix"></div>
+    </ul>
   </div>
-
-
+  <br/>
   <pagination boundary-links="true" num-pages="noOfPages" current-page="currentPage" max-size="maxSize" on-select-page="retrieve_logs(page)"></pagination>
-  
-  
-  
-
-
-    <table class="table table-striped table-bordered table-condensed">
+  <table class="table table-striped table-bordered table-condensed">
     <thead>
       <tr>
         <th ng-hide="chka"> Time </th>
@@ -124,7 +116,7 @@
       </tr>
     </thead>
     <tbody>
-      
+
       <tr ng-repeat = "row in LogData | filter:log_row">
         <td  class="date_column" ng-hide="chka" ng-bind-template="{{row['date'] * 1000 | date:'medium' }}"></td>
         <td  class="ip_column" ng-hide="chkb">{{row["client_ip"]}}</td>
@@ -135,7 +127,7 @@
         <td  class="request_column" ng-hide="chkg">{{row["os"]}}</td>
         <td  class="request_column" ng-hide="chkh">{{row["browser"]}}</td>
       </tr>
-      
+
     </tbody>
   </table>
 
